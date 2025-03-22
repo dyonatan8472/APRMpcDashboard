@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block title %}Agent Details{% endblock title %}
+{% block body_block %}
+<div class="container">
+    <div class="jumbotron text-center">
+        <h1>Search for Agents</h1>
+        <hr>
+        <h2>Please enter the Agent ID(s)</h2>
+        </br>
+
+        <form action="{% url "a_prm:agent_details" %}" method="POST">
+            {% csrf_token %}
+            <textarea class="form-control input-sm" rows="2" id="id_number" name="id_number" required="required" autofocus></textarea>
+
+            <hr>
+            <input type="submit" value="GO!">
+        </form>
+    </div>
+</div>
+
+    <div class="container">
+            {% if agent_details %}
+                <div class="container">
+                    <div class="jumbotron">
+                    <h1>Agent Details</h1>
+                </div>
+            </div>
+
+            <table WIDTH='100%' BORDER='1'>
+                <tr bgcolor="#808080">
+                    <th align="center">Create Date</th>
+                    <th align="center">Agent ID</th>
+                    <th align="center">Dealer Code</th>
+                    <th align="center">Dealer Name</th>
+                    <th align="center">First Name</th>
+                    <th align="center">Last Name</th>
+                    <th align="center">Sub Dealer ID</th>
+                    <th align="center">Sub Dealer Name</th>
+                    <th align="center">Retail Outlet ID</th>
+                    <th align="center">Retail Outlet Name</th>
+                </tr>
+                {% for create_date, agent_id, delear_code, delar_name, first_name, last_name, sub_dealer_id, sub_dealer_name, retail_outlet_id, retail_outle_name in agent_details %}
+                    <tr>
+                        <td align="left">{{ create_date }}</td>
+                        <td align="left">{{ agent_id }}</td>
+                        <td align="left">{{ delear_code }}</td>
+                        <td align="left">{{ delar_name }}</td>
+                        <td align="left">{{ first_name }}</td>
+                        <td align="left">{{ last_name }}</td>
+                        <td align="left">{{ sub_dealer_id }}</td>
+                        <td align="left">{{ sub_dealer_name }}</td>
+                        <td align="left">{{ retail_outlet_id }}</td>
+                        <td align="left">{{ retail_outle_name }}</td>
+                    </tr>
+                {% endfor %}
+            </table>
+
+            {% else %}
+            <h1>No Data available at present</h1>
+            {% endif %}
+            </table>
+            <br/>
+    </div>
+
+
+{% endblock %}

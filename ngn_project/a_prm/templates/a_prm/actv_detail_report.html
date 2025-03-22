@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}ACTV Detail Report{% endblock title %}
+
+{% block body_block %}
+<div class="container">
+    <div class="jumbotron text-center">
+        <h1>ACTV DTL Report</h1>
+        <hr>
+        <h2>Please enter the ISDN number(s).</h2>
+        </br>
+
+        <form action="{% url "a_prm:actv_detail_report" %}" method="POST">
+            {% csrf_token %}
+            <textarea class="form-control input-sm" rows="2" id="id_number" name="id_number" required="required" autofocus></textarea>
+
+            <hr>
+            <input type="submit" value="GO!">
+        </form>
+    </div>
+</div>
+    
+{% endblock %}

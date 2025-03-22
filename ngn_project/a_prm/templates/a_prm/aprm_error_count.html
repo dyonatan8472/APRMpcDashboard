@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% block title %}APRM Error Report{% endblock title %}
+
+{% block body_block %}
+<div class="container fixed">
+        <div class="jumbotron text-center">
+        <h1 class="display-4">{{ title }}</h1>
+    </div>
+</div>
+
+<div class="container">
+    <div class="row">
+        <div class="col">
+            <h1>Current Error Count</h1>
+            {% if total_errors %}
+            <table class="table table-striped table-bordered table-hover">
+                <tr>
+                    <th align="center">Dominant Error Code</th>
+                    <th align="center">Error Description</th>
+                    <th align="center">Error Target</th>
+                    <th align="center">Comments</th>
+                    <th align="center">Count</th>
+                </tr>
+                {% for dominant_err_cd, err_desc, error_target, comments, count in total_errors %}
+                    {% if error_target == 'AMDOCS' %}
+                        <tr style="background: #75d9cf">
+                   {% elif error_target == 'TELKOM' %}
+                        <tr style="background: #ba8b66">
+                   {% elif error_target == 'TELKOM/RECON' %}
+                        <tr style="background: #db5314">
+                    {% endif %}
+                            <td align="left">{{ dominant_err_cd }}</td>
+                            <td align="left">{{ err_desc }}</td>
+                            <td align="left">{{ error_target }}</td>
+                            <td align="left">{{ comments }}</td>
+                            <td align="left">{{ count }}</td>
+                        </tr>
+                {% endfor %}
+            </table>
+            {% else %}
+            <h1>No Data available at present for Total Errors</h1>
+            {% endif %}
+        </div>
+        <div class="col">
+            <h1>Errors older than 60 days from the current month bill date</h1>
+            {% if older_errors %}
+            <table class="table table-striped table-bordered table-hover">
+                <tr>
+                    <th align="center">Dominant Error Code</th>
+                    <th align="center">Error Description</th>
+                    <th align="center">Error Target</th>
+                    <th align="center">Comments</th>
+                    <th align="center">Count</th>
+                </tr>
+                {% for dominant_err_cd, err_desc, error_target, comments, count in older_errors %}
+                    {% if error_target == 'AMDOCS' %}
+                        <tr style="background: #75d9cf">
+                   {% elif error_target == 'TELKOM' %}
+                        <tr style="background: #ba8b66">
+                   {% elif error_target == 'TELKOM/RECON' %}
+                        <tr style="background: #db5314">
+                    {% endif %}
+                            <td align="left">{{ dominant_err_cd }}</td>
+                            <td align="left">{{ err_desc }}</td>
+                            <td align="left">{{ error_target }}</td>
+                            <td align="left">{{ comments }}</td>
+                            <td align="left">{{ count }}</td>
+                        </tr>
+                {% endfor %}
+            </table>
+            {% else %}
+            <h1>No Data available at present for Older Errors</h1>
+            {% endif %}
+        </div>
+    </div>
+    <br>
+</div>
+
+
+{% endblock %}

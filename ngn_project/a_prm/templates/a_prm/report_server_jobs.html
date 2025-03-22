@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}Report Server Jobs{% endblock title %}
+
+{% block body_block %}
+    <div class="container fixed mt-3">
+        <div class="jumbotron text-center">
+            <h1 class="display-4">{{ title }}</h1>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="row">
+            <div class="col">
+                {% if job_server_report %}
+                    <table class="table table-striped table-bordered table-hover">
+                        <tr bgcolor="#808080">
+                            <th align="center">Job Record Number</th>
+                            <th align="center">Flex Report Code</th>
+                            <th align="center">Generation Date</th>
+                            <th align="center">Last Update</th>
+                            <th align="center">File Name</th>
+                            <th align="center">Job Status</th>
+                        </tr>
+                        {% for item in job_server_report %}
+                                <td align="left">{{ item.job_rec }}</td>
+                                <td align="left">{{ item.flx_rep_cd }}</td>
+                                <td align="left">{{ item.generation_date }}</td>
+                                <td align="left">{{ item.sys_update_date }}</td>
+                                <td align="left">{{ item.file_name }}</td>
+                                <td align="left">{{ item.job_status }}</td>
+                            </tr>
+                        {% endfor %}
+                    </table>
+            </div>
+
+                {% else %}
+                    <h1>Nothing To Report</h1>
+                {% endif %}
+                <br />
+        </div>
+
+
+{% endblock %}

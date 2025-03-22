@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+{% block title %}MSISDN Details{% endblock title %}
+{% block body_block %}
+
+<div class="container fixed mt-3">
+    <div class="jumbotron text-center">
+        <h1 class="display-4">MSISDN Details for: {{ msisdn }}</h1>
+    </div>
+</div>
+
+<div class="container">
+     <div class="row">
+            <div class="col">
+           {% if msisdn_details %}
+
+            <table class="table table-striped table-bordered table-hover">
+                <tr bgcolor="#808080">
+                    <th align="center">EDR ID</th>
+                    <th align="center">OLD MSISDN</th>
+                    <th align="center">Order Action ID</th>
+                    <th align="center">Transaction Type</th>
+                    <th align="center">Eff Date</th>
+                    <th align="center">Exp Date</th>
+                    <th align="center">SIM Number</th>
+                    <th align="center">Service Type</th>
+                    <th align="center">Application ID</th>
+                    <th align="center">Offer Code</th>
+                    <th align="center">Deal ID</th>
+                    <th align="center">Dealer Code</th>
+                </tr>
+                {% for edr_id, msisdn, old_msisdn, order_action_id, trans_type, effective_date, expiration_date, sim_seq_num, ser_type, application_id, offer_code, deal_id, dealer_code, comm_mdcode, comm_sdcode, comm_rocode in msisdn_details %}
+                    <tr>
+                        {% if '3000' in expiration_date %}
+                            <tr style="background: #03fc1c">
+                        {% endif %}
+                        <td align="left">{{ edr_id }}</td>
+                        <td align="left">{{ old_msisdn }}</td>
+                        <td align="left">{{ order_action_id }}</td>
+                        <td align="center">{{ trans_type }}</td>
+                        <td style="white-space: nowrap" align="center">{{ effective_date|date:"d-m-Y H:i:s" }}</td>
+                        <td style="white-space: nowrap" align="center">{{ expiration_date|date:"d-m-Y H:i:s" }}</td>
+                        <td align="left">{{ sim_seq_num }}</td>
+                        <td align="center">{{ ser_type }}</td>
+                        <td align="left">{{ application_id }}</td>
+                        <td align="left">{{ offer_code }}</td>
+                        <td align="left">{{ deal_id }}</td>
+                        <td align="center">{{ dealer_code }}</td>
+                    </tr>
+                {% endfor %}
+            </table>
+        </div>
+
+        {% else %}
+        <h1>No Data found</h1>
+        {% endif %}
+        <br/>
+       {% if err_details %}
+            <div class="container fixed mt-3">
+                <div class="jumbotron text-center">
+                    <h2q class="display-4">Errors for: {{ msisdn }}</h2q>
+                </div>
+            </div>
+
+            <table class="table table-striped table-bordered table-hover">
+                <tr bgcolor="#808080">
+                    <th align="center">EDR ID</th>
+                    <th align="center">Event Type</th>
+                    <th align="center">Order Action ID</th>
+                    <th align="center">Transaction Type</th>
+                    <th align="center">New MSISDN</th>
+                    <th align="center">SIM Number</th>
+                    <th align="center">New SIM Number</th>
+                    <th align="center">Error Code</th>
+                    <th align="center">Start Date</th>
+                    <th align="center">Dealer Code</th>
+                    <th align="center">Service Type</th>
+                    <th align="center">Offer Code</th>
+                    <th align="center">Deal ID</th>
+                </tr>
+                {% for edr_id, event_type, order_action_id, trans_type, new_msisdn, sim_seq_num, new_sim_seq_num, dominant_err_cd, event_start_datetime, dealer_cd, ser_type, offer_code, deal_id in err_details %}
+                    <tr>
+                        <td align="left">{{ edr_id }}</td>
+                        <td align="left">{{ event_type }}</td>
+                        <td align="left">{{ order_action_id }}</td>
+                        <td align="center">{{ trans_type }}</td>
+                        <td align="center">{{ new_msisdn }}</td>
+                        <td align="left">{{ sim_seq_num }}</td>
+                        <td align="left">{{ new_sim_seq_num }}</td>
+                        <td align="left">{{ dominant_err_cd }}</td>
+                        <td style="white-space: nowrap" align="center">{{ event_start_datetime|date:"d-m-Y H:i:s" }}</td>
+                        <td align="center">{{ dealer_cd }}</td>
+                        <td align="center">{{ ser_type }}</td>
+                        <td align="left">{{ offer_code }}</td>
+                        <td align="left">{{ deal_id }}</td>
+                    </tr>
+                {% endfor %}
+            </table>
+        {% endif %}
+
+
+     </div>
+
+</div>
+
+
+{% endblock %}

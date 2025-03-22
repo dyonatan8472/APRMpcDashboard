@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block title %}APRM Error Report{% endblock title %}
+
+{% block body_block %}
+<div class="container">
+    <div class="jumbotron text-center">
+        <h1>{{ title }}</h1>
+    </div>
+</div>
+    
+    <div class="container">
+        <div class="row">
+            <div class="col mb-3">
+                {% if total_errors %}
+                <h1>Current Total Error Count</h1>
+                <table WIDTH='100%' BORDER='1'>
+                    <tr bgcolor="#808080">
+                        <th align="center">Dominant Error Code</th>
+                        <th align="center">Error Description</th>
+                        <th align="center">Error Target</th>
+                        <th align="center">Comments</th>
+                        <th align="center">Count</th>
+                    </tr>
+                    {% for dominant_err_cd, err_desc, error_target, comments, count in total_errors %}
+                    <tr bgcolor="#ff9966">
+                        <td align="left">{{ dominant_err_cd }}</td>
+                        <td align="left">{{ err_desc }}</td>
+                        <td align="left">{{ error_target }}</td>
+                        <td align="left">{{ comments }}</td>
+                        <td align="left">{{ count }}</td>
+                    </tr>
+                    {% endfor %}
+                </table>
+                {% else %}
+                <h1>No Data available at present for Total Errors</h1>
+                {% endif %}
+            </div>
+            <div class="col">
+                <h1>Errors older than 60 days from the current EOM date</h1>
+                {% if older_errors %}
+                <table WIDTH='100%' BORDER='1'>
+                    <tr bgcolor="#808080">
+                        <th align="center">Dominant Error Code</th>
+                        <th align="center">Error Description</th>
+                        <th align="center">Error Target</th>
+                        <th align="center">Comments</th>
+                        <th align="center">Count</th>
+                    </tr>
+                    {% for dominant_err_cd, err_desc, error_target, comments, count in older_errors %}
+                    <tr bgcolor="#ff9966">
+                        <td align="left">{{ dominant_err_cd }}</td>
+                        <td align="left">{{ err_desc }}</td>
+                        <td align="left">{{ error_target }}</td>
+                        <td align="left">{{ comments }}</td>
+                        <td align="left">{{ count }}</td>
+                    </tr>
+                    {% endfor %}
+                </table>
+                {% else %}
+                <h1>No Data available at present for Older Errors</h1>
+                {% endif %}
+            </div>
+        </div>
+        <br>
+    </div>
+
+
+{% endblock %}

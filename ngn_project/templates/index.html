@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Index{% endblock title %}
+
+{% block body_block %}
+<div class="container mt-4">
+    <div class="jumbotron justify-content-center mt-7">
+        <h1>Welcome to the APRM Dashboard</h1>
+    </div>
+</div>
+<div class="center-block">
+    <img src={% static 'main_pic.jpg' %} class="img-fluid">
+</div>
+{% endblock %}

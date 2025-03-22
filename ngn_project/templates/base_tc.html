@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <title>Base TC</title>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+            <a class="navbar-brand" href="#">TC Dashboard</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNavDropdown">
+                <ul class="navbar-nav">
+                <li 
+                {% if fixed_by_period in request.path %}
+                    class="nav-item active mr-3"
+                {% else %}
+                    class="nav-item mr-3"
+                {% endif %}    
+                >
+                    <a class="nav-link" href="{% url 'tc:fixed_by_period' %}">Fixed By Period WITHIN 90 Days<span class="sr-only">(current)</span></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'tc:fixed_90' %}">Fixed 90</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'tc:fixed_by_error' %}">Fixed by Error</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'tc:mobile_by_period_90' %}">Mobile By Period WITHIN 90</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'tc:mobile_90' %}">Mobile 90</a>
+                </li>
+            
+            </ul>
+        </div>
+    </nav>
+    <div class="container">
+        {% block body_block %}
+        {% endblock %}
+    </div>    
+</body>
+</html>

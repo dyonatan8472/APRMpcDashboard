@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}DMS Detail Report{% endblock title %}
+
+{% block body_block %}
+<div class="container">
+    <div class="jumbotron">
+        <h1>Search for Deal IDs</h1>
+        <hr>
+        <h2>Please enter the Deal ID(s).</h2>
+        </br>
+
+        <form action="{% url "a_prm:dms_detail_report" %}" method="POST">
+            {% csrf_token %}
+            <textarea class="form-control input-sm" rows="2" id="id_number" name="id_number" required="required" autofocus></textarea>
+
+            <hr>
+            <input type="submit" value="GO!">
+        </form>
+    </div>
+</div>
+
+{% endblock %}

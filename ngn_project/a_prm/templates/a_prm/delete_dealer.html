@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}Delete Dealer{% endblock title %}
+
+{% block body_block %}
+<div class="container">
+    <div class="jumbotron">
+        <h1>Delete Agents</h1>
+        <hr>
+        <h2>Please enter the Agent ID(s).</h2>
+        </br>
+
+        <form action="{% url "a_prm:delete_dealer" %}" method="POST">
+            {% csrf_token %}
+            <textarea class="form-control input-sm" rows="2" id="id_number" name="id_number" required="required" autofocus></textarea>
+
+            <hr>
+            <input type="submit" value="GO!">
+        </form>
+    </div>
+</div>
+{% if agents_in_sec_user %}
+    <div class="container">
+        <div class="jumbotron">
+            <h1>{{ title }}</h1>
+            <p class="text-danger">Please first remove the users listed below in the APRM online ASM Admin tool at <a href="http://nbschl014:28013">http://nbschl014:28013 </a> and resubmit</p>
+        </div>
+    </div>
+
+    <div class="container">
+        <table WIDTH='100%' BORDER='1'>
+            <tr bgcolor="#808080">
+                <th align="center">Agent ID</th>
+            </tr>
+            {% for agent_id in agents_in_sec_user %}
+                <tr bgcolor="#ff9966">
+                    <td align="left">{{ agent_id }}</td>
+                </tr>
+            {% endfor %}
+        </table>
+    </div>    
+
+    {% else %}
+    <div class="container">
+    <h1>Agents Deleted</h1>
+    </div>
+    {% endif %}
+
+
+{% endblock %}

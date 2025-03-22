@@ -1,0 +1,56 @@
+{% extends "base_timer.html" %}
+{% block title %}Daemon Status{% endblock title %}
+
+{% block body_block %}
+    <div class="container fixed mt-3">
+        <div class="jumbotron text-center">
+            <h1 class="display-4">Daemon Status</h1>
+        </div>
+    </div>
+    
+    <div class="container">
+        <p>Last Refresh time: {{ current_datetime }}</p>
+
+        <p>Current disk usage is: {{ disk_usage }}%</p>
+        {% if number_of_fins == 0 %}
+
+            <p>There are currently no FIN files in the input directory</p>
+        {% else %}
+            <p>Number of FIN files at input directory: {{ number_of_fins }}</p>
+        {% endif %}
+    </div>
+
+    <div class="container">
+        <div class="row">
+            <div class="col">
+                <table class="table table-striped table-bordered table-hover">
+                    <tr bgcolor="#808080">
+                        <th align="center">Daemon Name</th>
+                        <th align="center">Up Since</th>
+                        <th align="center">status</th>
+                    </tr>
+                    {% for daemon_name, up_since, status in daemon_status %}
+                        {% if status == 'Down' %}
+                            <tr style="background: #db6758">
+                        {% else %}
+                            <tr style="background: #00cd00">
+                        {% endif %}
+
+                        <td align="left">{{ daemon_name }}</td>
+                        {% if status == 'Up' %}
+                            <td align="center">{{ up_since }}</td>
+                        {% else %}
+                            <td align="center">No Date</td>
+                        {% endif %}
+
+                        <td align="left">{{ status }}</td>
+                    </tr>
+                    {% endfor %}
+                </table>
+
+            </div>
+        </div>
+    </div>
+
+
+{% endblock %}

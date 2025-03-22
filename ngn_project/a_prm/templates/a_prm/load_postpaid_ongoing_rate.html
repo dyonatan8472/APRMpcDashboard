@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Load Postpaid Ongoing Rate{% endblock title %}
+
+{% block body_block %}
+<div class="container">
+    <div class="jumbotron">
+        <h2>Please load the Postpaid Ongoing Rate csv file.</h2>
+        <form action="{% url "a_prm:load_postpaid_ongoing_rate" %}" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="form-group">
+                <div class="col-9">
+                    <label for="file">Upload Postpaid Ongoing Rate file</label>
+                    <input type="file" class="form-control-file" name="postpaid_ongoing_rate_file"
+                        style="border: 1px solid black; padding: 5px;" required="required">
+                </div>
+                <hr>
+                <h2>Please input request number.</h2>
+      
+                    <input type="text" id="request_id" placeholder="0" name="request_id" required="required">
+                    <p>
+                </form>
+    
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    
+    <hr>
+</div>
+{% endblock %}
