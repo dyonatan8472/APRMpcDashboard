@@ -4,8 +4,12 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib import messages
 from django.utils import timezone
 
-from .models import PrmDatErrMngr, DmsDealDtl, DmsActvDtl, DmsPrepAccUsg, PrmFlexReportsStatus, DmsPrepAccUsg, \
-    DmsRechEvtDtl
+from .models import (PrmDatErrMngr, DmsDealDtl, DmsActvDtl, DmsPrepAccUsg, PrmFlexReportsStatus,
+                     DmsPrepAccUsg,
+                     DmsRechEvtDtl,
+                     DmsActvThreshold,
+                     DmsDealerCommsn, 
+                     )
 
 import pandas as pd
 import csv
@@ -17,6 +21,8 @@ import psutil
 from psutil import NoSuchProcess, process_iter
 import glob
 import os
+
+USER_NAME = os.environ['USER']
 
 
 # =======================================
@@ -40,7 +46,7 @@ def get_disk_usage():
                             stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
     out_list = output.stdout.split('\n')
-    match = [x for x in out_list if 'pkgaprm' in x and '%' in x]
+    match = [x for x in out_list if '/dev/mapper/vg_misc-tsa' in x and '%' in x]
     match = match[0]
     loc = match.index('%')
     disk_usage = int(match[loc - 3:loc])
@@ -142,7 +148,8 @@ def monitor_processing(request):
         file_status IN ('RD', 'IU', 'AF') AND cur_pgm_name != 'ICERR' AND nxt_pgm_name != 'ICREPDRP' AND sys_creation_date >= TO_DATE('2020-12-01','yyyy-mm-dd')
     GROUP BY 
         file_status, SUBSTR(file_name, 1, 4), cur_pgm_name, cur_file_alias, nxt_pgm_name, 
-        nxt_file_alias)
+        nxt_file_alias
+        )
         SELECT * FROM ac_control
         ORDER BY 
             CASE
@@ -151,7 +158,7 @@ def monitor_processing(request):
             1,3
     """
 
-    cursor = connections['aprm'].cursor()
+    cursor = connections['default'].cursor()
     cursor.execute(sql_monitor_query)
     process_report = cursor.fetchall()
     current_datetime = dt.datetime.now()
@@ -170,7 +177,12 @@ def activity_count(request):
     # =======================================
     sql_control_query = """
     WITH ac_control AS 
-    (SELECT 'ac_control_01' AS ac_contr, cur_file_alias, nxt_file_alias, file_status, TO_CHAR(COUNT(1), '999,999,999') AS record_count, TO_CHAR(SUM(wr_rec_quantity), '999,999,999') AS file_count
+    (
+    SELECT 'ac_control_01_rcy' AS ac_contr,cur_file_alias, nxt_file_alias, file_status, TO_CHAR(COUNT(1), '999,999,999') AS record_count, TO_CHAR(SUM(wr_rec_quantity), '999,999,999') AS file_count
+FROM ac_control_01 WHERE file_status IN('RD', 'IU') AND file_name LIKE '%RCY' AND file_name NOT LIKE '%DROP%'
+ GROUP BY 'ac_control_01', cur_file_alias, nxt_file_alias, file_status
+    UNION ALL
+    SELECT 'ac_control_01' AS ac_contr, cur_file_alias, nxt_file_alias, file_status, TO_CHAR(COUNT(1), '999,999,999') AS record_count, TO_CHAR(SUM(wr_rec_quantity), '999,999,999') AS file_count
     FROM ac_control_01 WHERE file_status IN ('RD', 'IU', 'AF') AND cur_pgm_name != 'ICERR' AND nxt_pgm_name != 'ICREPDRP' GROUP BY 'ac_control_01', cur_file_alias, nxt_file_alias, file_status
     UNION ALL
     SELECT 'ac_control_02'  AS ac_contr, cur_file_alias, nxt_file_alias, file_status, TO_CHAR(COUNT(1),'999,999,999') AS record_count, TO_CHAR(SUM(wr_rec_quantity), '999,999,999') AS file_count
@@ -198,7 +210,7 @@ def activity_count(request):
             1,2,4
     """
 
-    cursor = connections['aprm'].cursor()
+    cursor = connections['default'].cursor()
     cursor.execute(sql_control_query)
     control_report = cursor.fetchall()
     current_datetime = dt.datetime.now()
@@ -237,6 +249,7 @@ def load_cib(request):
         cib.columns = ['deal_id', 'dealr_cib', 'dlr_addl_cib', 'dlr_sales_agr', 'ata_reward_card', 'discount',
                        'special_deal',
                        'tenant_cd']
+        cib['deal_id'] = cib['deal_id'].str.replace(' ', '')
 
     except BadZipFile:
         messages.warning(request, 'Problem with the cib file. Please check!!')
@@ -290,6 +303,8 @@ def load_rib(request):
 
         rib.columns = ['dealer_rib', 'dlr_addl_rib', 'dlr_sales_agr_rib', 'ata_reward_card_rib', 'discount_rib',
                        'deal_id', 'special_deal', 'tenant_cd']
+        
+        rib['deal_id'] = rib['deal_id'].str.replace(' ', '')
 
     except BadZipFile:
         messages.warning(request, 'Problem with the rib file. Please check!!')
@@ -318,6 +333,115 @@ def load_rib(request):
 
     return render(request, 'a_prm/load_rib.html')
 
+# =======================================
+def load_threshold(request):
+    # =======================================
+    if not request.user.is_authenticated:
+        messages.error(request, 'You are not logged in! And that was very sneaky!!!')
+        return render(request, 'index.html')
+
+    if "GET" == request.method:
+        return render(request, 'a_prm/load_threshold.html', {})
+
+    request_id = request.POST.get("request_id").strip()
+
+    if not request_id.isdecimal():
+        messages.warning(request, 'Please supply a numeric value for request number!')
+        return render(request, 'a_prm/load_threshold.html')
+
+    request_id = int(request_id)
+
+    threshold_file = request.FILES["threshold_file"]
+    try:
+        threshold = pd.read_csv(threshold_file)
+
+        threshold.columns = ['dealer_cd', 'threshold_amt', 'tenant_cd']
+
+    except BadZipFile:
+        messages.warning(request, 'Problem with the dealer file. Please check!!')
+        return render(request, 'a_prm/load_threshold.html')
+    except Exception as e:
+        messages.warning(request, ('Problem with the dealer file. Please check the following: ' + str(e)))
+        return render(request, 'a_prm/load_threshold.html')
+
+    update_list = [dict(zip(threshold.iloc[i].index.values, threshold.iloc[i].values)) for i in range(len(threshold))]
+
+    for item in update_list:
+        item['request_id'] = request_id
+
+    insert_query = """INSERT INTO aprmrefwork.dms_actv_threshold
+     (sys_creation_date, application_id, dl_service_code, dealer_cd, threshold_amt, tenant_cd, operator_id) 
+     VALUES (sysdate, 'dlupld', 'IMP', :dealer_cd, :threshold_amt, :tenant_cd, :request_id)"""
+
+    try:
+        bulk_run('refwork', insert_query, update_list)
+
+    except Exception as e:
+        messages.warning(request, ('Problem with loading threshold onto database. Please check the following: ' + str(e)))
+        return render(request, 'a_prm/load_threshold.html')
+
+    messages.success(request, f'Threshold Upload successfully! {len(threshold)} threshold were inserted.')
+
+    return render(request, 'a_prm/load_threshold.html')
+
+
+# =======================================
+def load_dealer_commission(request):
+    # =======================================
+    if not request.user.is_authenticated:
+        messages.error(request, 'You are not logged in! And that was very sneaky!!!')
+        return render(request, 'index.html')
+
+    if "GET" == request.method:
+        return render(request, 'a_prm/load_dealer_commission.html', {})
+
+    request_id = request.POST.get("request_id").strip()
+
+    if not request_id.isdecimal():
+        messages.warning(request, 'Please supply a numeric value for request number!')
+        return render(request, 'a_prm/load_dealer_commission.html')
+
+    request_id = int(request_id)
+
+    dealer_commission_file = request.FILES["dealer_commission_file"]
+    try:
+        commission_rates = pd.read_csv(dealer_commission_file)
+        commission_rates = commission_rates.drop(commission_rates.columns[:2], axis=1) # Removing the first two redundant columns
+        commission_rates.columns = ['effective_date', 'commsn_code', 'partner_profile_cd', 'dealer_cd', 'comm_effective_date', 'qual_param_1_val', 'qual_param_2_val', 'qual_param_3_val', 'qual_param_4_val', 
+                                    'qual_param_5_val', 'qual_param_6_val', 'qual_param_7_val', 'qual_param_8_val', 'qual_param_9_val', 'qual_param_10_val', 'slab_order', 'step_tier_ind', 
+                                    'group_cd', 'from_slab', 'to_slab', 'slab_val', 'tenant_cd']
+
+
+    except BadZipFile:
+        messages.warning(request, 'Problem with the commission rates file. Please check!!')
+        return render(request, 'a_prm/load_dealer_commission.html')
+    except Exception as e:
+        messages.warning(request, ('Problem with the commission rates file. Please check the following: ' + str(e)))
+        return render(request, 'a_prm/load_dealer_commission.html')
+
+    update_list = [dict(zip(commission_rates.iloc[i].index.values, commission_rates.iloc[i].values)) for i in range(len(commission_rates))]
+
+    for item in update_list:
+        item['request_id'] = request_id
+
+    insert_query = """INSERT INTO dms_dealer_commsn
+     (sys_creation_date, application_id, dl_service_code, effective_date, commsn_code, partner_profile_cd, dealer_cd, comm_effective_date, qual_param_1_val, qual_param_2_val, 
+     qual_param_3_val, qual_param_4_val, qual_param_5_val, qual_param_6_val, qual_param_7_val, qual_param_8_val, qual_param_9_val, qual_param_10_val, slab_order, step_tier_ind, 
+     group_cd, from_slab, to_slab, slab_val, tenant_cd, operator_id) 
+     VALUES (sysdate, 'dlupld', 'IMP', TO_DATE(:effective_date, 'YYYY-MM-DD'), :commsn_code, :partner_profile_cd, :dealer_cd, TO_DATE(:comm_effective_date, 'YYYY-MM-DD'), :qual_param_1_val, :qual_param_2_val, :qual_param_3_val, 
+     :qual_param_4_val, :qual_param_5_val, :qual_param_6_val, :qual_param_7_val, :qual_param_8_val, :qual_param_9_val, :qual_param_10_val, :slab_order, :step_tier_ind, 
+     null, :from_slab, :to_slab, :slab_val, :tenant_cd, :request_id)"""
+
+    try:
+        bulk_run('refwork', insert_query, update_list)
+
+    except Exception as e:
+        messages.warning(request, ('Problem with loading commission rates onto database. Please check the following: ' + str(e)))
+        return render(request, 'a_prm/load_dealer_commission.html')
+
+    messages.success(request, f'Commission rates Upload successfully! {len(commission_rates)} commission rates were inserted.')
+
+    return render(request, 'a_prm/load_dealer_commission.html')
 
 # =======================================
 def load_dealers(request):
@@ -343,6 +467,8 @@ def load_dealers(request):
 
         dealers.columns = ['dealer_cd', 'deal_id', 'deal_type', 'status', 'account_status', 'effective_date',
                            'expiration_date', 'tenant_cd']
+
+        dealers['deal_id'] = dealers['deal_id'].str.replace(' ', '')
 
     except BadZipFile:
         messages.warning(request, 'Problem with the dealer file. Please check!!')
@@ -399,6 +525,9 @@ def load_deals(request):
         deals = pd.read_csv(deals_file, converters={'DMS_DEAL_DTL.OFFER_CODE': str})
         deals.columns = ['deal_id', 'offer_code', 'service_type', 'deal_start_date', 'deal_type', 'contract_period',
                          'customer_cib', 'component_cost', 'deal_end_date', 'tenant_cd']
+        
+        deals['deal_id'] = deals['deal_id'].str.replace(' ', '')
+        deals['offer_code'] = deals['offer_code'].str.replace(' ', '')
 
     except BadZipFile:
         messages.warning(request, 'Problem with the deals file. Please check!!')
@@ -500,9 +629,9 @@ def update_dealers(request):
 # =======================================
 def update_rech_event_dealers(request):
     # =======================================
-    # if not request.user.is_authenticated:
-    #     messages.error(request, 'You are not logged in! And that was very sneaky!!!')
-    #     return redirect('index.html')
+    if not request.user.is_authenticated:
+        messages.error(request, 'You are not logged in! And that was very sneaky!!!')
+        return redirect('index.html')
 
     if "GET" == request.method:
         return render(request, 'a_prm/update_rech_event_dealers.html', {})
@@ -540,7 +669,7 @@ def update_rech_event_dealers(request):
 
     try:
         for msisdn, dealer_cd, rech_unique_no, request_id in update_params:
-            DmsRechEvtDtl.objects.using('aprm').filter(msisdn=msisdn, rech_unique_no=rech_unique_no).update(
+            DmsRechEvtDtl.objects.filter(msisdn=msisdn, rech_unique_no=rech_unique_no).update(
                 sys_update_date=timezone.now(),
                 dealer_cd=dealer_cd,
                 operator_id=request_id,
@@ -599,7 +728,7 @@ def purge_dm73_by_msisdn(request):
     params_list = [{'msisdn': msisdn, 'operator_id': operator_id} for msisdn, operator_id in update_params]
 
     try:
-        bulk_run('aprm', update_for_purge, params_list)
+        bulk_run('default', update_for_purge, params_list)
     except Exception as e:
         messages.success(request, ('Problem with loading errors list onto database. Please check!!' + e))
         return render(request, 'a_prm/purge_dm73_by_msisdn.html')
@@ -667,7 +796,7 @@ def purge_errors(request):
                    edr_id, dominant_err_cd, operator_id in update_params]
 
     try:
-        bulk_run('aprm', update_for_purge, params_list)
+        bulk_run('default', update_for_purge, params_list)
     except Exception as e:
         messages.success(request, ('Problem with loading errors list onto database. Please check!! ' + str(e)))
         return render(request, 'a_prm/purge_errors.html')
@@ -714,7 +843,7 @@ def dms_detail_report(request):
     writer = csv.writer(response)
     writer.writerow(field_names)
 
-    for obj in model_class.objects.using('aprm').filter(deal_id__in=rows):
+    for obj in model_class.objects.filter(deal_id__in=rows):
         row = writer.writerow([getattr(obj, field) for field in field_names])
 
     return response
@@ -744,7 +873,7 @@ def actv_detail_report(request):
     writer = csv.writer(response)
     writer.writerow(field_names)
 
-    for obj in model_class.objects.using('aprm').filter(msisdn__in=rows):
+    for obj in model_class.objects.filter(msisdn__in=rows):
         row = writer.writerow([getattr(obj, field) for field in field_names])
 
     return response
@@ -774,7 +903,7 @@ def prus_detail_report(request):
     writer = csv.writer(response)
     writer.writerow(field_names)
 
-    for obj in model_class.objects.using('aprm').filter(msisdn__in=rows):
+    for obj in model_class.objects.filter(msisdn__in=rows):
         row = writer.writerow([getattr(obj, field) for field in field_names])
 
     return response
@@ -804,7 +933,7 @@ def usage_report(request):
     writer = csv.writer(response)
     writer.writerow(field_names)
 
-    for obj in model_class.objects.using('aprm').filter(msisdn__in=rows):
+    for obj in model_class.objects.filter(msisdn__in=rows):
         row = writer.writerow([getattr(obj, field) for field in field_names])
 
     return response
@@ -877,9 +1006,9 @@ def dm69_update(request):
              'deal_id': deal_id, 'effective_date': effective_date})
 
     try:
-        bulk_run('aprm', update_dms_all, update_params)
+        bulk_run('default', update_dms_all, update_params)
 
-        bulk_run('aprm', update_err_mngr, edr_id_list)
+        bulk_run('default', update_err_mngr, edr_id_list)
     except Exception as e:
         return render(request, 'a_prm/dm69_update.html',
                       {'error_message': "Problem with loading errors list onto database. Please check!  " + str(e)})
@@ -950,18 +1079,16 @@ def agent_details(request):
 
     id_numbers = "('{0}')".format("','".join(map(str, rows)))
 
-    query = f"""SELECT DISTINCT usr.sys_creation_date, agent_id, account_cd, usr.org_name, usr.first_name, usr.last_name, a.sub_dealer_id, 
-                usr1.org_name, a.retail_outlet_id, usr2.org_name
-                FROM dms_ro_agent_map_v a
-                LEFT JOIN prm_users usr
-                ON usr.user_cd = a.account_cd
-            LEFT JOIN prm_users usr1
-                ON usr1.user_cd = a.sub_dealer_id
-            LEFT JOIN prm_users usr2
-                ON usr2.user_cd = a.retail_outlet_id
-                WHERE agent_id IN {id_numbers}"""
+    query = f"""SELECT usr.sys_creation_date creation_date, map.agent_id agent_id , map.account_cd account_cd, info.org_name account_org, usr.first_name name, 
+    usr.last_name last_name, map.sub_dealer_id, info1.org_name sub_dealer_org, map.retail_outlet_id, info2.org_name retail_outlet_org
+    FROM dms_ro_agent_map_v map 
+    LEFT JOIN prm_users usr ON usr.user_cd = map.account_cd
+    LEFT JOIN dms_acc_addl_info info ON info.account_cd = map.account_cd
+    LEFT JOIN dms_acc_addl_info info1 ON info1.account_cd = map.sub_dealer_id
+    LEFT JOIN dms_acc_addl_info info2 ON info2.account_cd = map.retail_outlet_id
+    WHERE agent_id IN {id_numbers}"""
 
-    cursor = connections['aprm'].cursor()
+    cursor = connections['default'].cursor()
 
     cursor.execute(query)
     output = cursor.fetchall()
@@ -983,13 +1110,13 @@ def msisdn_details(request):
 
     full_content = request.POST.get('full_content', False)
 
-    query = f"""SELECT edr_id, msisdn, old_msisdn, order_action_id, trans_type,  effective_date, expiration_date, sim_seq_num, ser_type, application_id,
+    query = f"""SELECT edr_id, msisdn, old_msisdn, order_action_id, trans_type,  effective_date, expiration_date, sys_creation_date, sim_seq_num, ser_type, 
                 offer_code, deal_id, dealer_code, comm_mdcode, comm_sdcode, comm_rocode
                  FROM dms_actv_dtl WHERE msisdn = '{msisdn}' 
                 AND order_action_Id != 'BULKCEASE90' 
                 ORDER BY TO_NUMBER(order_action_id) DESC, expiration_date desc, edr_id DESC"""
 
-    cursor = connections['aprm'].cursor()
+    cursor = connections['default'].cursor()
 
     cursor.execute(query)
     msisdn_output = cursor.fetchall()
@@ -1070,33 +1197,32 @@ def aprm_error_count(request):
     # current_bill_date = dt.datetime.today().strftime("01-%b-%Y")
 
     get_total_errors = """SELECT a.dominant_err_cd ,b.err_desc ,
-            DECODE(a.phy_file_id, 999999999,'TELKOM/RECON' , 999999998, 'TELKOM/RECON', 999999997, 'TELKOM/RECON',
-            999999996,'TELKOM/RECON', 999999995, 'TELKOM/RECON', 999999994, 'TELKOM/RECON', 999999991, 'AMDOCS',
+            DECODE(a.phy_file_id, 999999999,'TELKOM/RECON' , 999999998, 'TELKOM/RECON', 999999997, 'TELKOM/RECON', 
+            999999996,'TELKOM/RECON', 999999995, 'TELKOM/RECON', 999999994, 'TELKOM/RECON', 999999991, 'AMDOCS', 
             999999990,'TELKOM', 999999993, 'AMDOCS', c.error_target) error_target,
-            DECODE(a.phy_file_id, 999999999, 'MSISDN CEASED BEFORE EVENT START_TIME', 999999998,
-            'CEASE ORDER NOT FOUND ON OMS_APRM_RECON', 999999997, 'MSISDN does not exist on DMS_ACTV_DTL', 999999996,
-            'DM12 Related', 999999995,'Missing transactions', 999999994,
-            'RECORD START TIME BEFORE THE MIN EFFECTIVE_DATE IN DMS_ACTV_DTL', 999999991,
-            'Missing Offer code or Deal ID', 999999990, 'Telkom Dependent', 999999993, 'DM12 Related', 'N/A') comments,
-            TO_CHAR(COUNT(1),'999,999,999')
+            DECODE(a.phy_file_id, 999999999, 'MSISDN CEASED BEFORE EVENT START_TIME', 999999998, 
+            'CEASE ORDER NOT FOUND ON OMS_APRM_RECON', 999999997, 'MSISDN does not exist on DMS_ACTV_DTL', 999999996, 
+            'DM12 Related', 999999995,'Missing transactions', 999999994, 
+            'RECORD START TIME BEFORE THE MIN EFFECTIVE_DATE IN DMS_ACTV_DTL', 999999991, 
+            'Missing Offer code or Deal ID', 999999990, 'Telkom Dependent', 999999993, 'DM12 Related', 'N/A') comments, 
+            TO_CHAR(COUNT(1),'999,999,999') 
             FROM prm_dat_err_mngr a, ic_error_codes b, error_targets c
             WHERE a.dominant_err_cd = b.error_code
             AND a.dominant_err_cd = c.error_code
             group by a.DOMINANT_ERR_CD ,b.ERR_DESC ,
-            DECODE(a.phy_file_id, 999999999, 'TELKOM/RECON', 999999998,'TELKOM/RECON', 999999997, 'TELKOM/RECON',
-            999999996, 'TELKOM/RECON',
-            999999995, 'TELKOM/RECON', 999999994, 'TELKOM/RECON', 999999991, 'AMDOCS', 999999990, 'TELKOM', 999999993,
+            DECODE(a.phy_file_id, 999999999, 'TELKOM/RECON', 999999998,'TELKOM/RECON', 999999997, 'TELKOM/RECON', 
+            999999996, 'TELKOM/RECON', 
+            999999995, 'TELKOM/RECON', 999999994, 'TELKOM/RECON', 999999991, 'AMDOCS', 999999990, 'TELKOM', 999999993, 
             'AMDOCS', c.error_target),
-            DECODE(a.phy_file_id, 999999999,'MSISDN CEASED BEFORE EVENT START_TIME', 999999998,
+            DECODE(a.phy_file_id, 999999999,'MSISDN CEASED BEFORE EVENT START_TIME', 999999998, 
             'CEASE ORDER NOT FOUND ON OMS_APRM_RECON',
-            999999997,'MSISDN does not exist on DMS_ACTV_DTL', 999999996,'DM12 Related', 999999995,
+            999999997,'MSISDN does not exist on DMS_ACTV_DTL', 999999996,'DM12 Related', 999999995, 
             'Missing transactions',
-            999999994,'RECORD START TIME BEFORE THE MIN EFFECTIVE_DATE IN DMS_ACTV_DTL', 999999991,
+            999999994,'RECORD START TIME BEFORE THE MIN EFFECTIVE_DATE IN DMS_ACTV_DTL', 999999991, 
             'Missing Offer code or Deal ID',
             999999990,'Telkom Dependent', 999999993,'DM12 Related', 'N/A') ORDER BY 5 DESC"""
 
-
-    get_older_errors = """SELECT a.dominant_err_cd, b.err_desc,
+    get_older_errors = """SELECT a.dominant_err_cd, b.err_desc, 
         DECODE(A.PHY_FILE_ID, 999999999,'TELKOM/RECON', 999999998, 'TELKOM/RECON', 999999997, 'TELKOM/RECON', 999999996,
         'TELKOM/RECON',
         999999995,'TELKOM/RECON', 999999994,'TELKOM/RECON', 999999991, 'AMDOCS', 999999990, 'TELKOM',
@@ -1116,9 +1242,9 @@ def aprm_error_count(request):
         AND a.dominant_err_cd = c.error_code
         AND a.event_start_datetime < (SELECT TRUNC(LAST_DAY(logical_date)) -60 FROM logical_date WHERE expiration_date IS NULL AND logical_date_type = 'B')
         GROUP BY a.dominant_err_cd ,b.err_desc ,
-        DECODE(a.phy_file_id, 999999999, 'TELKOM/RECON' , 999999998, 'TELKOM/RECON', 999999997, 'TELKOM/RECON',
+        DECODE(a.phy_file_id, 999999999, 'TELKOM/RECON' , 999999998, 'TELKOM/RECON', 999999997, 'TELKOM/RECON', 
         999999996, 'TELKOM/RECON',
-        999999995,'TELKOM/RECON', 999999994, 'TELKOM/RECON', 999999991, 'AMDOCS', 999999990, 'TELKOM', 999999993,
+        999999995,'TELKOM/RECON', 999999994, 'TELKOM/RECON', 999999991, 'AMDOCS', 999999990, 'TELKOM', 999999993, 
         'AMDOCS', C.ERROR_TARGET),
         DECODE(a.phy_file_id,
         999999999,'MSISDN CEASED BEFORE EVENT START_TIME' ,
@@ -1194,94 +1320,136 @@ def recycle_errors(request):
     return render(request, 'a_prm/recycle_errors.html')
 
 
-# # --------------------------
-# def get_processes():
-#     # --------------------------
-#
-#     while True:
-#         try:
-#             process_list = [proc for proc in psutil.process_iter(attrs=("name", "create_time")) if
-#                             proc.username() == USER_NAME]
-#         except psutil.NoSuchProcess:
-#             continue
-#         break
-#
-#     process_dicts = [{"pid": proc.pid, "create_time": proc.create_time()} for proc in process_list]
-#
-#     return process_dicts
-#
+# --------------------------
+def get_processes():
+    # --------------------------
+
+    while True:
+        try:
+            process_list = [proc for proc in psutil.process_iter(attrs=("name", "create_time")) if
+                            proc.username() == USER_NAME]
+        except psutil.NoSuchProcess:
+            continue
+        break
+
+    process_dicts = [{"pid": proc.pid, "create_time": proc.create_time()} for proc in process_list]
+
+    return process_dicts
+
 
 # =======================================
-# def daemon_status(request):
-#     # =======================================
-#
-#     DAEMONS = [
-#         ('LISTINER', 'gutl_classes', 'gutl_classes', 'grep'),
-#         ('EVENT_MANAGER_DEF', 'icsmpgum', 'icsmpgum', 'ICUSGMGR'),
-#         ('EVENT_MANAGER_1', 'icsmpgum', 'ICUSGMGR1', 'grep'),
-#         ('EVENT_MANAGER_2', 'icsmpgum', 'ICUSGMGR2', 'grep'),
-#         ('EVENT_MANAGER_3', 'icsmpgum', 'ICUSGMGR3', 'grep'),
-#         ('EVENT_MANAGER_4', 'icsmpgum', 'ICUSGMGR4', 'grep'),
-#         ('EVENT_MANAGER_5', 'icsmpgum', 'ICUSGMGR5', 'grep'),
-#         ('RATER_DEF', 'ICRATER', 'ICRTDEF', 'grep'),
-#         ('RATER_1', 'ICRT001', 'ICRT001', 'grep'),
-#         ('RATER_2', 'ICRT002', 'ICRT002', 'grep'),
-#         ('RATER_3', 'ICRT003', 'ICRT003', 'grep'),
-#         ('RATER_4', 'ICRT004', 'ICRT004', 'grep'),
-#         ('RATER_5', 'ICRT005', 'ICRT005', 'grep'),
-#         ('RATER_6', 'ICRT006', 'ICRT006', 'grep'),
-#         ('RATER_7', 'ICRT007', 'ICRT007', 'grep'),
-#         ('UPLOAD_RATED_USAGE_DEF', 'prm_upload_rated_usg', 'prm_upload_rated_usg', 'UPRTUSAGE'),
-#         ('UPLOAD_RATED_USAGE_1', 'UPRTUSAGE1', 'UPRTUSAGE1', 'grep'),
-#         ('UPLOAD_RATED_USAGE_2', 'UPRTUSAGE2', 'UPRTUSAGE2', 'grep'),
-#         ('UPLOAD_RATED_USAGE_3', 'UPRTUSAGE3', 'UPRTUSAGE3', 'grep'),
-#         ('UPLOAD_RATED_USAGE_4', 'UPRTUSAGE4', 'UPRTUSAGE4', 'grep'),
-#         ('UPLOAD_RATED_USAGE_5', 'UPRTUSAGE5', 'UPRTUSAGE5', 'grep'),
-#         ('UPLOAD_RATED_USAGE_6', 'UPRTUSAGE6', 'UPRTUSAGE6', 'grep'),
-#         ('UPLOAD_RATED_USAGE_7', 'UPRTUSAGE7', 'UPRTUSAGE7', 'grep'),
-#     ]
-#
-#     number_of_fins = len(glob.glob('/pkgaprm1/abpprm1/inf/prdaprm1/var/sat/LSN/input1/*.FIN'))
-#     disk_usage = get_disk_usage()
-#
-#     processes = get_processes()
-#
-#     daemon_status_list = []
-#
-#     for daemon, job, i_process, rec in DAEMONS:
-#
-#         command = f'ps -fu {USER_NAME} | grep -e {job} | grep {i_process} |grep -v {rec} | grep -v grep'
-#         try:
-#             process = subprocess.run(command, shell=True, check=True, stdout=subprocess.PIPE, universal_newlines=True)
-#         except subprocess.CalledProcessError:
-#             daemon_state = None
-#         else:
-#             daemon_state = process.stdout.strip()
-#
-#         if daemon_state:
-#             _, pid, *_ = daemon_state.split()
-#             for process_time in processes:
-#                 if process_time.get('pid') == int(pid):
-#                     row = (
-#                         daemon,
-#                         dt.datetime.fromtimestamp(process_time.get('create_time')).strftime("%H:%M:%S %d-%m-%Y"),
-#                         'Up')
-#         else:
-#             row = (daemon, '', 'Down')
-#
-#         daemon_status_list.append(row)
-#
-#         current_datetime = dt.datetime.now()
-#
-#     context = {
-#         "daemon_status": daemon_status_list,
-#         "disk_usage": disk_usage,
-#         "number_of_fins": number_of_fins,
-#         "current_datetime": current_datetime,
-#     }
-#
-#     return render(request, "a_prm/daemon_status.html", context)
-#
+def daemon_status(request):
+    # =======================================
+
+    DAEMONS = [
+        ('LISTINER', 'gutl_classes', 'gutl_classes', 'grep'),
+        ('EVENT_MANAGER_DEF', 'icsmpgum', 'icsmpgum', 'ICUSGMGR'),
+        ('EVENT_MANAGER_1', 'icsmpgum', 'ICUSGMGR1', 'grep'),
+        ('EVENT_MANAGER_2', 'icsmpgum', 'ICUSGMGR2', 'grep'),
+        ('EVENT_MANAGER_3', 'icsmpgum', 'ICUSGMGR3', 'grep'),
+        ('EVENT_MANAGER_4', 'icsmpgum', 'ICUSGMGR4', 'grep'),
+        ('EVENT_MANAGER_5', 'icsmpgum', 'ICUSGMGR5', 'grep'),
+        ('EVENT_MANAGER_6', 'icsmpgum', 'ICUSGMGR6', 'grep'),
+        ('EVENT_MANAGER_7', 'icsmpgum', 'ICUSGMGR7', 'grep'),
+        ('RATER_DEF', 'ICRATER', 'ICRTDEF', 'grep'),
+        ('RATER_1', 'ICRT001', 'ICRT001', 'grep'),
+        ('RATER_2', 'ICRT002', 'ICRT002', 'grep'),
+        ('RATER_3', 'ICRT003', 'ICRT003', 'grep'),
+        ('RATER_4', 'ICRT004', 'ICRT004', 'grep'),
+        ('RATER_5', 'ICRT005', 'ICRT005', 'grep'),
+        ('RATER_6', 'ICRT006', 'ICRT006', 'grep'),
+        ('RATER_7', 'ICRT007', 'ICRT007', 'grep'),
+        ('UPLOAD_RATED_USAGE_DEF', 'prm_upload_rated_usg', 'prm_upload_rated_usg', 'UPRTUSAGE'),
+        ('UPLOAD_RATED_USAGE_1', 'UPRTUSAGE1', 'UPRTUSAGE1', 'grep'),
+        ('UPLOAD_RATED_USAGE_2', 'UPRTUSAGE2', 'UPRTUSAGE2', 'grep'),
+        ('UPLOAD_RATED_USAGE_3', 'UPRTUSAGE3', 'UPRTUSAGE3', 'grep'),
+        ('UPLOAD_RATED_USAGE_4', 'UPRTUSAGE4', 'UPRTUSAGE4', 'grep'),
+        ('UPLOAD_RATED_USAGE_5', 'UPRTUSAGE5', 'UPRTUSAGE5', 'grep'),
+        ('UPLOAD_RATED_USAGE_6', 'UPRTUSAGE6', 'UPRTUSAGE6', 'grep'),
+        ('UPLOAD_RATED_USAGE_7', 'UPRTUSAGE7', 'UPRTUSAGE7', 'grep'),
+    ]
+
+    number_of_fins = len(glob.glob('/users/tsa/prdprm1/var/tsa/LSN/input1/*.FIN'))
+    disk_usage = get_disk_usage()
+
+    processes = get_processes()
+
+    daemon_status_list = []
+
+    for daemon, job, i_process, rec in DAEMONS:
+
+        command = f'ps -fu {USER_NAME} | grep -e {job} | grep {i_process} |grep -v {rec} | grep -v grep'
+        try:
+            process = subprocess.run(command, shell=True, check=True, stdout=subprocess.PIPE, universal_newlines=True)
+        except subprocess.CalledProcessError:
+            daemon_state = None
+        else:
+            daemon_state = process.stdout.strip()
+
+        if daemon_state:
+            _, pid, *_ = daemon_state.split()
+            for process_time in processes:
+                if process_time.get('pid') == int(pid):
+                    row = (
+                        daemon,
+                        dt.datetime.fromtimestamp(process_time.get('create_time')).strftime("%H:%M:%S %d-%m-%Y"),
+                        'Up')
+        else:
+            row = (daemon, '', 'Down')
+
+        daemon_status_list.append(row)
+
+        current_datetime = dt.datetime.now()
+
+    context = {
+        "daemon_status": daemon_status_list,
+        "disk_usage": disk_usage,
+        "number_of_fins": number_of_fins,
+        "current_datetime": current_datetime,
+    }
+
+    return render(request, "a_prm/daemon_status.html", context)
+
+
+# =======================================
+def dm48_missing_deals(request):
+    # =======================================
+    query = """SELECT DISTINCT future_1 dealer_cd, qual_param_4_val deal_id, dtl.offer_code, dtl.service_type, dtl.deal_start_date, dtl.deal_end_date FROM prm_dat_err_mngr err
+                JOIN dms_deal_dtl dtl ON qual_param_4_val = dtl.deal_id
+                WHERE dominant_err_cd IN ('DM48')
+                AND NOT EXISTS (SELECT 1 FROM dms_deal_map WHERE future_1 = dealer_cd AND qual_param_4_val = deal_id AND expiration_date > TRUNC(sysdate))
+                ORDER BY 1,2,3"""
+
+    # cursor = connections['aprm'].cursor()
+    conn = connections
+
+    df = pd.read_sql_query(query, conn)
+    # cursor.execute(query)
+    # rows = cursor.fetchall()
+
+    heading = ['DEALER_CD', 'DEAL_ID', 'OFFER_CODE', 'SERVICE_TYPE', 'DEAL_START_DATE', 'DEAL_END_DATE']
+
+    df['DEAL_ID'].astype(str)
+    df['OFFER_CODE'].astype(str)
+
+    response = HttpResponse(content_type='text/csv')
+    current_date = dt.datetime.today().strftime("%Y%m%d_%H%M")
+
+    response[
+        'Content-Disposition'] = f'attachment; filename="dm48_missing_deals_{current_date}.csv"'
+
+    # writer = csv.writer(response, lineterminator='\n', delimiter=',')
+    # writer.writerow(heading)
+    # for row in rows:
+    #     writer.writerow(row)
+    # response.write(','.join(heading) + '\n')
+    # for row in rows:
+    #     response.write(','.join(map(str, row)) + '\n')
+    # cursor.close()
+
+    df.to_csv(response, index=False)
+    return response
+
 
 # =======================================
 def missing_offers_ids(request):
@@ -1294,7 +1462,7 @@ def missing_offers_ids(request):
     TO_NUMBER(SUBSTR(adu, INSTR(adu, '95|') + 3, 3))) AS order_action_id
     FROM prm_dat_err_mngr WHERE iecd IN ('ACTV', 'MSIS', 'SISW') AND phy_file_id = 999999991
     """
-    cursor = connections['aprm'].cursor()
+    cursor = connections['default'].cursor()
 
     cursor.execute(query)
     output = cursor.fetchall()
@@ -1360,7 +1528,7 @@ def dm27_update(request):
         return render(request, 'a_prm/dm27_update.html')
 
     try:
-        bulk_run('aprm', update_dm27, edr_id_list)
+        bulk_run('default', update_dm27, edr_id_list)
 
     except Exception as e:
         messages.error(request,
@@ -1382,7 +1550,7 @@ def report_server_jobs(request):
 
     model_class = PrmFlexReportsStatus
 
-    qs = model_class.objects.using('aprm').filter(job_status__in=['RD', 'IU']).order_by('job_rec')
+    qs = model_class.objects.filter(job_status__in=['RD', 'IU']).order_by('job_rec')
     context = {
         'title': "Report Server Jobs",
         'job_server_report': qs,
