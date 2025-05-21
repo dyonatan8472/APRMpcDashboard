@@ -215,9 +215,9 @@ def activity_count(request):
 # =======================================
 def load_cib(request):
     # =======================================
-    if not request.user.is_authenticated:
-        messages.error(request, 'You are not logged in! And that was very sneaky!!!')
-        return render(request, 'index.html')
+    # if not request.user.is_authenticated:
+    #     messages.error(request, 'You are not logged in! And that was very sneaky!!!')
+    #     return render(request, 'index.html')
 
     if "GET" == request.method:
         return render(request, 'a_prm/load_cib.html', {})
@@ -269,9 +269,9 @@ def load_cib(request):
 # =======================================
 def load_rib(request):
     # =======================================
-    if not request.user.is_authenticated:
-        messages.error(request, 'You are not logged in! And that was very sneaky!!!')
-        return render(request, 'index.html')
+    # if not request.user.is_authenticated:
+    #     messages.error(request, 'You are not logged in! And that was very sneaky!!!')
+    #     return render(request, 'index.html')
 
     if "GET" == request.method:
         return render(request, 'a_prm/load_rib.html', {})
@@ -322,9 +322,9 @@ def load_rib(request):
 # =======================================
 def load_dealers(request):
     # =======================================
-    if not request.user.is_authenticated:
-        messages.error(request, 'You are not logged in! And that was very sneaky!!!')
-        return render(request, 'index.html')
+    # if not request.user.is_authenticated:
+    #     messages.error(request, 'You are not logged in! And that was very sneaky!!!')
+    #     return render(request, 'index.html')
 
     if "GET" == request.method:
         return render(request, 'a_prm/load_dealers.html', {})
@@ -379,9 +379,9 @@ def load_dealers(request):
 # =======================================
 def load_deals(request):
     # =======================================
-    if not request.user.is_authenticated:
-        messages.error(request, 'You are not logged in! And that was very sneaky!!!')
-        return render(request, 'index.html')
+    # if not request.user.is_authenticated:
+    #     messages.error(request, 'You are not logged in! And that was very sneaky!!!')
+    #     return render(request, 'index.html')
 
     if "GET" == request.method:
         return render(request, 'a_prm/load_deals.html', {})
@@ -435,9 +435,9 @@ def load_deals(request):
 # =======================================
 def update_dealers(request):
     # =======================================
-    if not request.user.is_authenticated:
-        messages.error(request, 'You are not logged in! And that was very sneaky!!!')
-        return redirect('index.html')
+    # if not request.user.is_authenticated:
+    #     messages.error(request, 'You are not logged in! And that was very sneaky!!!')
+    #     return redirect('index.html')
 
     if "GET" == request.method:
         return render(request, 'a_prm/update_dealers.html', {})
@@ -500,9 +500,9 @@ def update_dealers(request):
 # =======================================
 def update_rech_event_dealers(request):
     # =======================================
-    if not request.user.is_authenticated:
-        messages.error(request, 'You are not logged in! And that was very sneaky!!!')
-        return redirect('index.html')
+    # if not request.user.is_authenticated:
+    #     messages.error(request, 'You are not logged in! And that was very sneaky!!!')
+    #     return redirect('index.html')
 
     if "GET" == request.method:
         return render(request, 'a_prm/update_rech_event_dealers.html', {})
@@ -1070,32 +1070,33 @@ def aprm_error_count(request):
     # current_bill_date = dt.datetime.today().strftime("01-%b-%Y")
 
     get_total_errors = """SELECT a.dominant_err_cd ,b.err_desc ,
-            DECODE(a.phy_file_id, 999999999,'TELKOM/RECON' , 999999998, 'TELKOM/RECON', 999999997, 'TELKOM/RECON', 
-            999999996,'TELKOM/RECON', 999999995, 'TELKOM/RECON', 999999994, 'TELKOM/RECON', 999999991, 'AMDOCS', 
+            DECODE(a.phy_file_id, 999999999,'TELKOM/RECON' , 999999998, 'TELKOM/RECON', 999999997, 'TELKOM/RECON',
+            999999996,'TELKOM/RECON', 999999995, 'TELKOM/RECON', 999999994, 'TELKOM/RECON', 999999991, 'AMDOCS',
             999999990,'TELKOM', 999999993, 'AMDOCS', c.error_target) error_target,
-            DECODE(a.phy_file_id, 999999999, 'MSISDN CEASED BEFORE EVENT START_TIME', 999999998, 
-            'CEASE ORDER NOT FOUND ON OMS_APRM_RECON', 999999997, 'MSISDN does not exist on DMS_ACTV_DTL', 999999996, 
-            'DM12 Related', 999999995,'Missing transactions', 999999994, 
-            'RECORD START TIME BEFORE THE MIN EFFECTIVE_DATE IN DMS_ACTV_DTL', 999999991, 
-            'Missing Offer code or Deal ID', 999999990, 'Telkom Dependent', 999999993, 'DM12 Related', 'N/A') comments, 
-            TO_CHAR(COUNT(1),'999,999,999') 
-            FROM prm_dat_err_mngr a, ic_error_codes b, aprmappo.error_targets c
+            DECODE(a.phy_file_id, 999999999, 'MSISDN CEASED BEFORE EVENT START_TIME', 999999998,
+            'CEASE ORDER NOT FOUND ON OMS_APRM_RECON', 999999997, 'MSISDN does not exist on DMS_ACTV_DTL', 999999996,
+            'DM12 Related', 999999995,'Missing transactions', 999999994,
+            'RECORD START TIME BEFORE THE MIN EFFECTIVE_DATE IN DMS_ACTV_DTL', 999999991,
+            'Missing Offer code or Deal ID', 999999990, 'Telkom Dependent', 999999993, 'DM12 Related', 'N/A') comments,
+            TO_CHAR(COUNT(1),'999,999,999')
+            FROM prm_dat_err_mngr a, ic_error_codes b, error_targets c
             WHERE a.dominant_err_cd = b.error_code
             AND a.dominant_err_cd = c.error_code
             group by a.DOMINANT_ERR_CD ,b.ERR_DESC ,
-            DECODE(a.phy_file_id, 999999999, 'TELKOM/RECON', 999999998,'TELKOM/RECON', 999999997, 'TELKOM/RECON', 
-            999999996, 'TELKOM/RECON', 
-            999999995, 'TELKOM/RECON', 999999994, 'TELKOM/RECON', 999999991, 'AMDOCS', 999999990, 'TELKOM', 999999993, 
+            DECODE(a.phy_file_id, 999999999, 'TELKOM/RECON', 999999998,'TELKOM/RECON', 999999997, 'TELKOM/RECON',
+            999999996, 'TELKOM/RECON',
+            999999995, 'TELKOM/RECON', 999999994, 'TELKOM/RECON', 999999991, 'AMDOCS', 999999990, 'TELKOM', 999999993,
             'AMDOCS', c.error_target),
-            DECODE(a.phy_file_id, 999999999,'MSISDN CEASED BEFORE EVENT START_TIME', 999999998, 
+            DECODE(a.phy_file_id, 999999999,'MSISDN CEASED BEFORE EVENT START_TIME', 999999998,
             'CEASE ORDER NOT FOUND ON OMS_APRM_RECON',
-            999999997,'MSISDN does not exist on DMS_ACTV_DTL', 999999996,'DM12 Related', 999999995, 
+            999999997,'MSISDN does not exist on DMS_ACTV_DTL', 999999996,'DM12 Related', 999999995,
             'Missing transactions',
-            999999994,'RECORD START TIME BEFORE THE MIN EFFECTIVE_DATE IN DMS_ACTV_DTL', 999999991, 
+            999999994,'RECORD START TIME BEFORE THE MIN EFFECTIVE_DATE IN DMS_ACTV_DTL', 999999991,
             'Missing Offer code or Deal ID',
             999999990,'Telkom Dependent', 999999993,'DM12 Related', 'N/A') ORDER BY 5 DESC"""
 
-    get_older_errors = """SELECT a.dominant_err_cd, b.err_desc, 
+
+    get_older_errors = """SELECT a.dominant_err_cd, b.err_desc,
         DECODE(A.PHY_FILE_ID, 999999999,'TELKOM/RECON', 999999998, 'TELKOM/RECON', 999999997, 'TELKOM/RECON', 999999996,
         'TELKOM/RECON',
         999999995,'TELKOM/RECON', 999999994,'TELKOM/RECON', 999999991, 'AMDOCS', 999999990, 'TELKOM',
@@ -1110,14 +1111,14 @@ def aprm_error_count(request):
         999999990,'Telkom Dependent',
         999999993,'DM12 Related',
         'N/A') comments ,TO_CHAR(COUNT(1),'999,999,999')
-        FROM prm_dat_err_mngr a , ic_error_codes b , aprmappo.error_targets C
+        FROM prm_dat_err_mngr a , ic_error_codes b , error_targets C
         WHERE a.dominant_err_cd = b.error_code
         AND a.dominant_err_cd = c.error_code
-        AND a.event_start_datetime < TRUNC(last_day(sysdate)) - 60
+        AND a.event_start_datetime < (SELECT TRUNC(LAST_DAY(logical_date)) -60 FROM logical_date WHERE expiration_date IS NULL AND logical_date_type = 'B')
         GROUP BY a.dominant_err_cd ,b.err_desc ,
-        DECODE(a.phy_file_id, 999999999, 'TELKOM/RECON' , 999999998, 'TELKOM/RECON', 999999997, 'TELKOM/RECON', 
+        DECODE(a.phy_file_id, 999999999, 'TELKOM/RECON' , 999999998, 'TELKOM/RECON', 999999997, 'TELKOM/RECON',
         999999996, 'TELKOM/RECON',
-        999999995,'TELKOM/RECON', 999999994, 'TELKOM/RECON', 999999991, 'AMDOCS', 999999990, 'TELKOM', 999999993, 
+        999999995,'TELKOM/RECON', 999999994, 'TELKOM/RECON', 999999991, 'AMDOCS', 999999990, 'TELKOM', 999999993,
         'AMDOCS', C.ERROR_TARGET),
         DECODE(a.phy_file_id,
         999999999,'MSISDN CEASED BEFORE EVENT START_TIME' ,
@@ -1132,7 +1133,7 @@ def aprm_error_count(request):
         'N/A')
         ORDER BY 5 DESC"""
 
-    cursor = connections['aprm'].cursor()
+    cursor = connections['default'].cursor()
     cursor.execute(get_total_errors)
     total_errors = cursor.fetchall()
     cursor.execute(get_older_errors)

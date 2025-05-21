@@ -56,7 +56,6 @@
             <li class="nav-item">
                 <a class="nav-link {% if request.path == path_to_agent_details %}active{% endif %}" href="{% url 'a_prm:agent_details' %}">Agent Details</a>
             </li>
-            {% if user.is_authenticated %}
                 <li class="nav-item dropdown">
                     <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">Error Management</a>
                     <div class="dropdown-menu">
@@ -83,7 +82,6 @@
                         <a href="{% url 'a_prm:update_rech_event_dealers' %}" class="dropdown-item">Update Rech Event Dealers </a>
                     </div>
                 </li>
-            {% endif %}
 
             <li class="nav-item">
                 <form class="form-inline" method="post" action="{% url 'a_prm:msisdn_details' %}">

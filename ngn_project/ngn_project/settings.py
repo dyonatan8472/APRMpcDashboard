@@ -81,49 +81,26 @@ DATABASES = {
     'default': {
         'ENGINE':   'django.db.backends.oracle',
         'NAME':     'prdprm',
-        'USER':     'davidsj3',
-        'PASSWORD': 'Fish_1030',
-        'HOST': 'pkgprmdb.telkom.co.za',
+        'USER':     'APRMAPPC',
+        'PASSWORD': 'APRMAPPC',
+        'HOST': 'tcenhvbssprd128.telkom.co.za',
         'PORT': '1527',
     },
-    'prdcst': {
-        'ENGINE':   'django.db.backends.oracle',
-        'NAME':     'prdcst',
-        'USER':     'readcust',
-        'PASSWORD': 'readcust',
-        'HOST': 'pkgcstdb.telkom.co.za',
-        'PORT': '1527',
-    },
-    'prdcrm': {
-        'ENGINE':   'django.db.backends.oracle',
-        'NAME':     'prdcst',
-        'USER':     'sa',
-        'PASSWORD': 'sa',
-        'HOST': 'pkgcstdb.telkom.co.za',
-        'PORT': '1527',
-    },
-    'prdaem': {
-        'ENGINE':   'django.db.backends.oracle',
-        'NAME':     'prdaem',
-        'USER':     'prdaem',
-        'PASSWORD': 'prdaem',
-        'HOST': 'pkgprmdb.telkom.co.za',
-        'PORT': '1527',
-    },
-    'aprm': {
+        'aprm': {
         'ENGINE':   'django.db.backends.oracle',
         'NAME':     'prdprm',
         'USER':     'APRMAPPC',
         'PASSWORD': 'APRMAPPC',
-        'HOST': 'pkgprmdb.telkom.co.za',
+        'HOST': 'tcenhvbssprd128.telkom.co.za',
         'PORT': '1527',
     },
+
     'aprmo': {
         'ENGINE':   'django.db.backends.oracle',
         'NAME':     'prdprm',
         'USER':     'APRMAPPO',
         'PASSWORD': 'APRMAPPO',
-        'HOST': 'pkgprmdb.telkom.co.za',
+        'HOST': 'tcenhvbssprd128.telkom.co.za',
         'PORT': '1527',
     },
     'refwork': {
@@ -131,7 +108,7 @@ DATABASES = {
         'NAME':     'prdprm',
         'USER':     'aprmrefwork',
         'PASSWORD': 'aprmrefwork',
-        'HOST': 'pkgprmdb.telkom.co.za',
+        'HOST': 'tcenhvbssprd128.telkom.co.za',
         'PORT': '1527',
     },
     'refwait': {
@@ -139,7 +116,7 @@ DATABASES = {
         'NAME':     'prdprm',
         'USER':     'aprmrefwait',
         'PASSWORD': 'aprmrefwait',
-        'HOST': 'pkgprmdb.telkom.co.za',
+        'HOST': 'tcenhvbssprd128.telkom.co.za',
         'PORT': '1527',
     },
     'xaprmseco': {
@@ -147,7 +124,7 @@ DATABASES = {
         'NAME':     'prdprm',
         'USER':     'xaprmseco',
         'PASSWORD': 'xaprmseco',
-        'HOST': 'pkgprmdb.telkom.co.za',
+        'HOST': 'tcenhvbssprd128.telkom.co.za',
         'PORT': '1527',
     },
 
