@@ -227,9 +227,9 @@ FROM ac_control_01 WHERE file_status IN('RD', 'IU') AND file_name LIKE '%RCY' AN
 # =======================================
 def load_cib(request):
     # =======================================
-    # if not request.user.is_authenticated:
-    #     messages.error(request, 'You are not logged in! And that was very sneaky!!!')
-    #     return render(request, 'index.html')
+    if not request.user.is_authenticated:
+        messages.error(request, 'You are not logged in! And that was very sneaky!!!')
+        return redirect(request, 'index.html')
 
     if "GET" == request.method:
         return render(request, 'a_prm/load_cib.html', {})
@@ -282,9 +282,9 @@ def load_cib(request):
 # =======================================
 def load_rib(request):
     # =======================================
-    # if not request.user.is_authenticated:
-    #     messages.error(request, 'You are not logged in! And that was very sneaky!!!')
-    #     return render(request, 'index.html')
+    if not request.user.is_authenticated:
+        messages.error(request, 'You are not logged in! And that was very sneaky!!!')
+        return redirect(request, 'index.html')
 
     if "GET" == request.method:
         return render(request, 'a_prm/load_rib.html', {})
@@ -338,7 +338,7 @@ def load_threshold(request):
     # =======================================
     if not request.user.is_authenticated:
         messages.error(request, 'You are not logged in! And that was very sneaky!!!')
-        return render(request, 'index.html')
+        return redirect(request, 'index.html')
 
     if "GET" == request.method:
         return render(request, 'a_prm/load_threshold.html', {})
@@ -390,7 +390,7 @@ def load_dealer_commission(request):
     # =======================================
     if not request.user.is_authenticated:
         messages.error(request, 'You are not logged in! And that was very sneaky!!!')
-        return render(request, 'index.html')
+        return redirect(request, 'index.html')
 
     if "GET" == request.method:
         return render(request, 'a_prm/load_dealer_commission.html', {})
@@ -446,9 +446,9 @@ def load_dealer_commission(request):
 # =======================================
 def load_dealers(request):
     # =======================================
-    # if not request.user.is_authenticated:
-    #     messages.error(request, 'You are not logged in! And that was very sneaky!!!')
-    #     return render(request, 'index.html')
+    if not request.user.is_authenticated:
+        messages.error(request, 'You are not logged in! And that was very sneaky!!!')
+        return redirect(request, 'index.html')
 
     if "GET" == request.method:
         return render(request, 'a_prm/load_dealers.html', {})
@@ -505,9 +505,9 @@ def load_dealers(request):
 # =======================================
 def load_deals(request):
     # =======================================
-    # if not request.user.is_authenticated:
-    #     messages.error(request, 'You are not logged in! And that was very sneaky!!!')
-    #     return render(request, 'index.html')
+    if not request.user.is_authenticated:
+        messages.error(request, 'You are not logged in! And that was very sneaky!!!')
+        return redirect(request, 'index.html')
 
     if "GET" == request.method:
         return render(request, 'a_prm/load_deals.html', {})
@@ -564,9 +564,9 @@ def load_deals(request):
 # =======================================
 def update_dealers(request):
     # =======================================
-    # if not request.user.is_authenticated:
-    #     messages.error(request, 'You are not logged in! And that was very sneaky!!!')
-    #     return redirect('index.html')
+    if not request.user.is_authenticated:
+        messages.error(request, 'You are not logged in! And that was very sneaky!!!')
+        return redirect('index.html')
 
     if "GET" == request.method:
         return render(request, 'a_prm/update_dealers.html', {})
@@ -690,7 +690,7 @@ def purge_dm73_by_msisdn(request):
     if not request.user.is_authenticated:
         messages.error(request, 'You are not logged in!  And that was very sneaky!!!')
         return redirect('index.html')
-    print('In purge_dm73_by_msisdn')
+
     if "GET" == request.method:
         return render(request, 'a_prm/purge_dm73_by_msisdn.html', {})
 
