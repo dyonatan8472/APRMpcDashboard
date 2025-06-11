@@ -462,11 +462,14 @@ def load_dealers(request):
     request_id = int(request_id)
 
     dealers_file = request.FILES["dealers_file"]
-    try:
-        dealers = pd.read_csv(dealers_file)
 
-        dealers.columns = ['dealer_cd', 'deal_id', 'deal_type', 'status', 'account_status', 'effective_date',
-                           'expiration_date', 'tenant_cd']
+    try:
+        dealers = pd.read_csv(dealers_file, sep='|')
+
+        dealers = dealers.drop(dealers.columns[0], axis=1)
+
+        dealers.columns = ['dealer_cd', 'deal_id', 'effective_date', 'deal_type', 'status', 'account_status',
+                           'expiration_date']
 
         dealers['deal_id'] = dealers['deal_id'].str.replace(' ', '')
 
@@ -482,16 +485,13 @@ def load_dealers(request):
     for item in update_list:
         item['request_id'] = request_id
 
-    insert_query = """INSERT INTO aprmrefwork.dms_deal_map
+    insert_query = """INSERT INTO dms_deal_map
      (sys_creation_date, application_id, dl_service_code, dealer_cd, deal_id, deal_type, status, account_status, effective_date,
     expiration_date, tenant_cd, operator_id) VALUES (sysdate, 'dlupld', 'IMP', :dealer_cd, :deal_id, :deal_type, :status, :account_status, TO_DATE(:effective_date, 'YYYY-MM-DD'),
-    TO_DATE(:expiration_date, 'YYYY-MM-DD'), :tenant_cd, :request_id)"""
+    TO_DATE(:expiration_date, 'YYYY-MM-DD'), 'DMS', :request_id)"""
 
-    select_query = """SELECT dealer_cd, deal_id, deal_type, status, account_status, effective_date, expiration_date, tenant_cd FROM aprmrefwork.dms_deal_map WHERE
-        dealer_cd = :dealer_cd AND deal_id = :deal_id AND deal_type = :deal_type AND status = :status AND account_status = :account_status
-    """
     try:
-        bulk_run('default', insert_query, update_list)
+        bulk_run('refwork', insert_query, update_list)
 
     except Exception as e:
         messages.warning(request, ('Problem with loading dealers onto database. Please check the following: ' + str(e)))
@@ -595,12 +595,7 @@ def update_dealers(request):
     df['REQUEST_ID'] = int(request_id)
 
     df.columns = map(str.upper, df.columns)  # All column names to upper
-
-    # update_dms_dealer = """UPDATE dms_actv_dtl SET sys_update_date = sysdate,  dealer_code = :dealer_code,
-    #     comm_mdcode = :comm_mdcode, comm_sdcode = :comm_sdcode,
-    #     comm_rocode = :comm_rocode, operator_id = :request_id
-    #     WHERE edr_id = :edr_id"""
-
+    
     try:
         update_params = df[['EDR_ID', 'UPDATED_DEALER_CODE', 'UPDATED_COMM_MDCODE',
                             'UPDATED_COMM_SDCODE', 'UPDATED_COMM_ROCODE', 'REQUEST_ID']].values.tolist()
