@@ -1,10 +1,16 @@
 from django.db import models
+from django.utils import timezone
 
 
 # Create your models here.
+
+#------------------------------------------------------
+# prm_dat_err_mngr
+#------------------------------------------------------
+
 class PrmDatErrMngr(models.Model):
     err_seq_num = models.IntegerField(primary_key=True)
-    sys_creation_date = models.DateField()
+    sys_creation_date = models.DateField(default=timezone.now)
     sys_update_date = models.DateField(blank=True, null=True)
     operator_id = models.IntegerField(blank=True, null=True)
     application_id = models.CharField(max_length=6, blank=True, null=True)
@@ -167,7 +173,7 @@ class DmsDealDtl(models.Model):
     service_type = models.CharField(max_length=3)
     deal_start_date = models.DateField()
     deal_type = models.CharField(max_length=1)
-    sys_creation_date = models.DateField()
+    sys_creation_date = models.DateField(default=timezone.now)
     sys_update_date = models.DateField(blank=True, null=True)
     operator_id = models.IntegerField(blank=True, null=True)
     application_id = models.CharField(max_length=6, blank=True, null=True)
@@ -189,7 +195,7 @@ class DmsDealDtl(models.Model):
 
 
 class DmsActvDtl(models.Model):
-    sys_creation_date = models.DateField()
+    sys_creation_date = models.DateField(default=timezone.now)
     sys_update_date = models.DateField(blank=True, null=True)
     operator_id = models.IntegerField(blank=True, null=True)
     application_id = models.CharField(max_length=6, blank=True, null=True)
@@ -236,7 +242,7 @@ class DmsActvDtl(models.Model):
 class DmsPrepAccUsg(models.Model):
     msisdn = models.CharField(primary_key=True, max_length=20)
     bp_start_date = models.DateField()
-    sys_creation_date = models.DateField()
+    sys_creation_date = models.DateField(default=timezone.now)
     sys_update_date = models.DateField(blank=True, null=True)
     operator_id = models.IntegerField(blank=True, null=True)
     application_id = models.CharField(max_length=6, blank=True, null=True)
@@ -253,7 +259,7 @@ class DmsPrepAccUsg(models.Model):
 
 class PrmAccounts(models.Model):
     account_cd = models.CharField(primary_key=True, max_length=20)
-    sys_creation_date = models.DateField()
+    sys_creation_date = models.DateField(default=timezone.now)
     sys_update_date = models.DateField(blank=True, null=True)
     operator_id = models.IntegerField(blank=True, null=True)
     application_id = models.CharField(max_length=6, blank=True, null=True)
@@ -273,7 +279,7 @@ class PrmAccounts(models.Model):
 class PrmAccBusinessDtls(models.Model):
     account_cd = models.CharField(primary_key=True, max_length=20)
     effective_date = models.DateField()
-    sys_creation_date = models.DateField()
+    sys_creation_date = models.DateField(default=timezone.now)
     sys_update_date = models.DateField(blank=True, null=True)
     operator_id = models.IntegerField(blank=True, null=True)
     application_id = models.CharField(max_length=6, blank=True, null=True)
@@ -303,7 +309,7 @@ class PrmAccBusinessDtls(models.Model):
 
 class PrmUsers(models.Model):
     user_cd = models.CharField(primary_key=True, max_length=20)
-    sys_creation_date = models.DateField()
+    sys_creation_date = models.DateField(default=timezone.now)
     sys_update_date = models.DateField(blank=True, null=True)
     operator_id = models.IntegerField(blank=True, null=True)
     application_id = models.CharField(max_length=6, blank=True, null=True)
@@ -324,7 +330,7 @@ class PrmUsers(models.Model):
 
 class PrmAccFinancialDtls(models.Model):
     account_cd = models.CharField(primary_key=True, max_length=20)
-    sys_creation_date = models.DateField()
+    sys_creation_date = models.DateField(default=timezone.now)
     sys_update_date = models.DateField(blank=True, null=True)
     operator_id = models.IntegerField(blank=True, null=True)
     application_id = models.CharField(max_length=6, blank=True, null=True)
@@ -351,7 +357,7 @@ class PrmAccFinancialDtls(models.Model):
 
 class PrmAccContactDtls(models.Model):
     account_cd = models.CharField(primary_key=True, max_length=20)
-    sys_creation_date = models.DateField()
+    sys_creation_date = models.DateField(default=timezone.now)
     sys_update_date = models.DateField(blank=True, null=True)
     operator_id = models.IntegerField(blank=True, null=True)
     application_id = models.CharField(max_length=6, blank=True, null=True)
@@ -377,7 +383,7 @@ class PrmAccContactDtls(models.Model):
 
 class DmsDealComm(models.Model):
     deal_id = models.CharField(primary_key=True, max_length=20)
-    sys_creation_date = models.DateField()
+    sys_creation_date = models.DateField(default=timezone.now)
     sys_update_date = models.DateField(blank=True, null=True)
     operator_id = models.IntegerField(blank=True, null=True)
     application_id = models.CharField(max_length=6, blank=True, null=True)
@@ -399,7 +405,7 @@ class DmsDealComm(models.Model):
 
 class DmsDealCommRib(models.Model):
     deal_id = models.CharField(primary_key=True, max_length=20)
-    sys_creation_date = models.DateField()
+    sys_creation_date = models.DateField(default=timezone.now)
     sys_update_date = models.DateField(blank=True, null=True)
     operator_id = models.IntegerField(blank=True, null=True)
     application_id = models.CharField(max_length=6, blank=True, null=True)
@@ -424,7 +430,7 @@ class DmsDealMap(models.Model):
     deal_id = models.CharField(max_length=20)
     effective_date = models.DateField()
     deal_type = models.CharField(max_length=1)
-    sys_creation_date = models.DateField()
+    sys_creation_date = models.DateField(default=timezone.now)
     sys_update_date = models.DateField(blank=True, null=True)
     operator_id = models.IntegerField(blank=True, null=True)
     application_id = models.CharField(max_length=6, blank=True, null=True)
@@ -447,7 +453,7 @@ class DmsHybridRates(models.Model):
     dealer_cd = models.CharField(max_length=20)
     deal_id = models.CharField(max_length=20)
     charge_cd = models.CharField(max_length=20)
-    sys_creation_date = models.DateField()
+    sys_creation_date = models.DateField(default=timezone.now)
     sys_update_date = models.DateField(blank=True, null=True)
     operator_id = models.IntegerField(blank=True, null=True)
     application_id = models.CharField(max_length=6, blank=True, null=True)
@@ -469,7 +475,7 @@ class DmsPostpaidRates(models.Model):
     dealer_cd = models.CharField(max_length=20)
     deal_id = models.CharField(max_length=20)
     charge_cd = models.CharField(max_length=20)
-    sys_creation_date = models.DateField()
+    sys_creation_date = models.DateField(default=timezone.now)
     sys_update_date = models.DateField(blank=True, null=True)
     operator_id = models.IntegerField(blank=True, null=True)
     application_id = models.CharField(max_length=6, blank=True, null=True)
@@ -492,7 +498,7 @@ class DmsPreHybRates(models.Model):
     deal_id = models.CharField(max_length=20)
     from_slab = models.DecimalField(max_digits=18, decimal_places=5)
     to_slab = models.DecimalField(max_digits=18, decimal_places=5, blank=True, null=True)
-    sys_creation_date = models.DateField()
+    sys_creation_date = models.DateField(default=timezone.now)
     sys_update_date = models.DateField(blank=True, null=True)
     operator_id = models.IntegerField(blank=True, null=True)
     application_id = models.CharField(max_length=6, blank=True, null=True)
@@ -512,7 +518,7 @@ class IcSubjectVersions(models.Model):
     subject = models.CharField(primary_key=True, max_length=400)
     code = models.CharField(max_length=400)
     effective_date = models.DateField()
-    sys_creation_date = models.DateField()
+    sys_creation_date = models.DateField(default=timezone.now)
     sys_update_date = models.DateField(blank=True, null=True)
     operator_id = models.IntegerField(blank=True, null=True)
     application_id = models.CharField(max_length=6, blank=True, null=True)
@@ -559,7 +565,7 @@ class PrmFlexReportsStatus(models.Model):
     job_rec = models.IntegerField(primary_key=True)
     flx_rep_cd = models.CharField(primary_key=True, max_length=16)
     generation_date = models.DateField(primary_key=True)
-    sys_creation_date = models.DateField()
+    sys_creation_date = models.DateField(default=timezone.now)
     sys_update_date = models.DateField(blank=True, null=True)
     operator_id = models.IntegerField(blank=True, null=True)
     application_id = models.CharField(max_length=6, blank=True, null=True)
@@ -593,7 +599,7 @@ class DmsDealerUpload(models.Model):
     ship_ind = models.CharField(primary_key=True, max_length=1)
     ship_date = models.DateField(primary_key=True)
     partition_id = models.IntegerField(primary_key=True)
-    sys_creation_date = models.DateField()
+    sys_creation_date = models.DateField(default=timezone.now)
     sys_update_date = models.DateField(blank=True, null=True)
     operator_id = models.IntegerField(blank=True, null=True)
     application_id = models.CharField(max_length=6, blank=True, null=True)
@@ -604,10 +610,9 @@ class DmsDealerUpload(models.Model):
     return_date = models.DateField(blank=True, null=True)
     src_ind = models.CharField(max_length=2, blank=True, null=True)
 
-
     class Meta:
         managed = False
-        db_table = 'prm_flex_reports_status'
+        db_table = 'dms_dealer_upload'
         unique_together = (('sim_seq_num', 'ship_ind', 'ship_date', 'partition_id'),)
 
 
@@ -618,7 +623,7 @@ class DmsRechEvtDtl(models.Model):
     event_start_date = models.DateField()
     rech_unique_no = models.CharField(max_length=20)
     balance_amount = models.DecimalField(max_digits=18, decimal_places=5)
-    sys_creation_date = models.DateField()
+    sys_creation_date = models.DateField(default=timezone.now)
     sys_update_date = models.DateField(blank=True, null=True)
     operator_id = models.IntegerField(blank=True, null=True)
     application_id = models.CharField(max_length=6, blank=True, null=True)
@@ -632,4 +637,107 @@ class DmsRechEvtDtl(models.Model):
     class Meta:
         managed = False
         db_table = 'dms_rech_evt_dtl'
-        unique_together = (('msisdn', 'event_start_date', 'service_type', 'dealer_cd', 'rech_unique_no', 'balance_amount'),)
+        unique_together = (
+        ('msisdn', 'event_start_date', 'service_type', 'dealer_cd', 'rech_unique_no', 'balance_amount'),)
+
+class DmsActvThreshold(models.Model):
+    dealer_cd = models.CharField(primary_key=True, max_length=20)
+    sys_creation_date = models.DateField(default=timezone.now)
+    sys_update_date = models.DateField(blank=True, null=True)
+    operator_id = models.IntegerField(blank=True, null=True)
+    application_id = models.CharField(max_length=6, blank=True, null=True)
+    dl_service_code = models.CharField(max_length=5)
+    dl_update_stamp = models.IntegerField(blank=True, null=True)
+    threshold_amt = models.DecimalField(max_digits=18, decimal_places=5, blank=True, null=True)
+    tenant_cd = models.CharField(max_length=20)
+
+    class Meta:
+        managed = False
+        db_table = 'dms_actv_threshold'
+        unique_together = (('dealer_cd', 'tenant_cd'),)
+
+class DmsDealerCommsn(models.Model):
+    commsn_code = models.CharField(primary_key=True, max_length=20)
+    partner_profile_cd = models.CharField(max_length=20)
+    dealer_cd = models.CharField(max_length=20)
+    comm_effective_date = models.DateField()
+    effective_date = models.DateField()
+    qual_param_1_val = models.CharField(max_length=20)
+    qual_param_2_val = models.CharField(max_length=20)
+    qual_param_3_val = models.CharField(max_length=20)
+    qual_param_4_val = models.CharField(max_length=20)
+    qual_param_5_val = models.CharField(max_length=20)
+    qual_param_6_val = models.CharField(max_length=20)
+    qual_param_7_val = models.CharField(max_length=20)
+    qual_param_8_val = models.CharField(max_length=20)
+    qual_param_9_val = models.CharField(max_length=20)
+    qual_param_10_val = models.CharField(max_length=20)
+    slab_order = models.IntegerField()
+    sys_creation_date = models.DateField(default=timezone.now)
+    sys_update_date = models.DateField(blank=True, null=True)
+    operator_id = models.IntegerField(blank=True, null=True)
+    application_id = models.CharField(max_length=6, blank=True, null=True)
+    dl_service_code = models.CharField(max_length=5)
+    dl_update_stamp = models.IntegerField(blank=True, null=True)
+    from_slab = models.DecimalField(max_digits=18, decimal_places=5)
+    to_slab = models.DecimalField(max_digits=18, decimal_places=5)
+    slab_val = models.DecimalField(max_digits=18, decimal_places=5)
+    expiration_date = models.DateField(blank=True, null=True)
+    step_tier_ind = models.CharField(max_length=1, blank=True, null=True)
+    group_cd = models.CharField(max_length=20, blank=True, null=True)
+    tenant_cd = models.CharField(max_length=20)
+
+    class Meta:
+        managed = False
+        db_table = 'dms_dealer_commsn'
+        unique_together = (('commsn_code', 'partner_profile_cd', 'dealer_cd', 'comm_effective_date', 'effective_date', 'qual_param_1_val', 'qual_param_2_val', 'qual_param_3_val', 'qual_param_4_val', 'qual_param_5_val', 'qual_param_6_val', 'qual_param_7_val', 'qual_param_8_val', 'qual_param_9_val', 'qual_param_10_val', 'slab_order', 'tenant_cd'),)
+
+class PrmIeDtlParam(models.Model):
+    event_date = models.DateField(primary_key=True)
+    edr_id = models.IntegerField()
+    generated_rec = models.IntegerField()
+    process_datetime = models.DateField(blank=True, null=True)
+    external_trunk = models.CharField(max_length=10, blank=True, null=True)
+    session_id = models.CharField(max_length=20, blank=True, null=True)
+    qual_param_1_val = models.CharField(max_length=20, blank=True, null=True)
+    qual_param_2_val = models.CharField(max_length=20, blank=True, null=True)
+    qual_param_3_val = models.CharField(max_length=20, blank=True, null=True)
+    qual_param_4_val = models.CharField(max_length=20, blank=True, null=True)
+    qual_param_5_val = models.CharField(max_length=20, blank=True, null=True)
+    qual_param_6_val = models.CharField(max_length=20, blank=True, null=True)
+    qual_param_7_val = models.CharField(max_length=20, blank=True, null=True)
+    nr_param_1_val = models.CharField(max_length=20, blank=True, null=True)
+    nr_param_2_val = models.CharField(max_length=20, blank=True, null=True)
+    nr_param_3_val = models.CharField(max_length=20, blank=True, null=True)
+    nr_param_4_val = models.CharField(max_length=20, blank=True, null=True)
+    orig_process_date = models.DateField(blank=True, null=True)
+    orig_event_datetime = models.DateField(blank=True, null=True)
+    commsn_sequences = models.CharField(max_length=4000, blank=True, null=True)
+    accountable_values = models.CharField(max_length=4000, blank=True, null=True)
+    eligible_values = models.CharField(max_length=4000, blank=True, null=True)
+    phy_file_id = models.IntegerField(blank=True, null=True)
+    originating_id = models.CharField(max_length=20, blank=True, null=True)
+    terminating_id = models.CharField(max_length=20, blank=True, null=True)
+    rerate_cnt = models.IntegerField(blank=True, null=True)
+    billing_pct = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)
+    bill_in_advance = models.CharField(max_length=1, blank=True, null=True)
+    total_bill_days = models.IntegerField(blank=True, null=True)
+    num_of_days = models.IntegerField(blank=True, null=True)
+    daily_ind = models.CharField(max_length=1, blank=True, null=True)
+    one_time_chrg_ind = models.CharField(max_length=1, blank=True, null=True)
+    orig_param = models.CharField(max_length=4000, blank=True, null=True)
+    addl_usage = models.CharField(max_length=4000, blank=True, null=True)
+    calc_acces_chrg = models.DecimalField(max_digits=18, decimal_places=5, blank=True, null=True)
+    calc_usage_chrg = models.DecimalField(max_digits=18, decimal_places=5, blank=True, null=True)
+    qual_param_8_val = models.CharField(max_length=20, blank=True, null=True)
+    qual_param_9_val = models.CharField(max_length=20, blank=True, null=True)
+    qual_param_10_val = models.CharField(max_length=20, blank=True, null=True)
+    account_cd = models.CharField(max_length=20, blank=True, null=True)
+    tenant_cd = models.CharField(max_length=20, blank=True, null=True)
+    rank1_account_cd = models.CharField(max_length=20, blank=True, null=True)
+    asset_cd = models.CharField(max_length=40, blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'prm_ie_dtl_param'
+        unique_together = (('event_date', 'edr_id', 'generated_rec'),)

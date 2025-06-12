@@ -21,14 +21,16 @@
                     <th align="center">Transaction Type</th>
                     <th align="center">Eff Date</th>
                     <th align="center">Exp Date</th>
+                    <th align="center">Create Date</th>
                     <th align="center">SIM Number</th>
                     <th align="center">Service Type</th>
-                    <th align="center">Application ID</th>
                     <th align="center">Offer Code</th>
                     <th align="center">Deal ID</th>
+                    <th align="center">Agent ID</th>
                     <th align="center">Dealer Code</th>
+                    
                 </tr>
-                {% for edr_id, msisdn, old_msisdn, order_action_id, trans_type, effective_date, expiration_date, sim_seq_num, ser_type, application_id, offer_code, deal_id, dealer_code, comm_mdcode, comm_sdcode, comm_rocode in msisdn_details %}
+                {% for edr_id, msisdn, old_msisdn, order_action_id, trans_type, effective_date, expiration_date, sys_creation_date, sim_seq_num, ser_type, offer_code, deal_id, agent_id, dealer_code, comm_mdcode, comm_sdcode, comm_rocode in msisdn_details %}
                     <tr>
                         {% if '3000' in expiration_date %}
                             <tr style="background: #03fc1c">
@@ -39,11 +41,12 @@
                         <td align="center">{{ trans_type }}</td>
                         <td style="white-space: nowrap" align="center">{{ effective_date|date:"d-m-Y H:i:s" }}</td>
                         <td style="white-space: nowrap" align="center">{{ expiration_date|date:"d-m-Y H:i:s" }}</td>
+                        <td style="white-space: nowrap" align="center">{{ sys_creation_date|date:"d-m-Y H:i:s" }}</td>
                         <td align="left">{{ sim_seq_num }}</td>
                         <td align="center">{{ ser_type }}</td>
-                        <td align="left">{{ application_id }}</td>
                         <td align="left">{{ offer_code }}</td>
                         <td align="left">{{ deal_id }}</td>
+                        <td align="center">{{ agent_id }}</td>
                         <td align="center">{{ dealer_code }}</td>
                     </tr>
                 {% endfor %}
@@ -72,12 +75,13 @@
                     <th align="center">New SIM Number</th>
                     <th align="center">Error Code</th>
                     <th align="center">Start Date</th>
+                    <th align="center">Agent ID</th>
                     <th align="center">Dealer Code</th>
                     <th align="center">Service Type</th>
                     <th align="center">Offer Code</th>
                     <th align="center">Deal ID</th>
                 </tr>
-                {% for edr_id, event_type, order_action_id, trans_type, new_msisdn, sim_seq_num, new_sim_seq_num, dominant_err_cd, event_start_datetime, dealer_cd, ser_type, offer_code, deal_id in err_details %}
+                {% for edr_id, event_type, order_action_id, trans_type, new_msisdn, sim_seq_num, new_sim_seq_num, dominant_err_cd, event_start_datetime, dealer_cd, ser_type, offer_code, deal_id, agent_id in err_details %}
                     <tr>
                         <td align="left">{{ edr_id }}</td>
                         <td align="left">{{ event_type }}</td>
@@ -88,6 +92,7 @@
                         <td align="left">{{ new_sim_seq_num }}</td>
                         <td align="left">{{ dominant_err_cd }}</td>
                         <td style="white-space: nowrap" align="center">{{ event_start_datetime|date:"d-m-Y H:i:s" }}</td>
+                        <td align="center">{{ agent_id }}</td>
                         <td align="center">{{ dealer_cd }}</td>
                         <td align="center">{{ ser_type }}</td>
                         <td align="left">{{ offer_code }}</td>

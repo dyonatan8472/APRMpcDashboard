@@ -10,6 +10,7 @@ from .models import (PrmDatErrMngr, DmsDealDtl, DmsActvDtl, DmsPrepAccUsg, PrmFl
                      DmsActvThreshold,
                      DmsDealerCommsn, 
                      )
+import xml.etree.ElementTree as ET
 
 import pandas as pd
 import csv
@@ -23,6 +24,51 @@ import glob
 import os
 
 USER_NAME = os.environ['USER']
+
+
+# ---------------------------------
+def get_agent_id_from_oms(order_action_id):
+# ---------------------------------
+    """Get the agent id from OMS"""
+
+    print(f'order_action_id: {order_action_id}')
+    query = f"""SELECT item.service_id, xml.xml_content FROM tborder_action tboa 
+            JOIN tb_xml xml on xml.xml_id = tboa.xml_id JOIN tbap_item item ON item.ap_id = tboa.ap_id WHERE order_unit_id = '{order_action_id}'
+            ORDER BY LPAD(item.order_action_id, 20, ' ') DESC, item.ctdb_cre_datetime DESC"""
+
+    # service_id, blob = oms_api.fetch_one(qeury, {'order_action_id': order_action_id})
+    cursor = connections['readoms'].cursor()
+    cursor.execute(query)
+    try:
+        service_id, blob = cursor.fetchone()
+    except TypeError:
+        return None, None
+
+    if blob:
+        blob_bytes = blob.read()
+        start_index = blob_bytes.find(b"<?xml")
+
+        if start_index != -1:
+            cleaned_bytes = blob_bytes[start_index:]
+            xml_data = cleaned_bytes.decode("utf-8")
+        else:
+            raise ValueError("XML declaration not found in BLOB")
+
+        # Parse XML
+        root = ET.fromstring(xml_data)
+
+        # Find the DealerHierarchy element and extract DealerAgentId
+        dealer_hierarchy = root.find('.//DealerHierarchy')
+        
+        if dealer_hierarchy is not None:
+            agent_id = dealer_hierarchy.attrib.get('DealerAgentId')
+        else:
+            print("DealerHierarchy element not found.")
+    else:
+        print("No BLOB data found.")    
+        return None, None
+
+    return service_id, agent_id
 
 
 # =======================================
@@ -1094,6 +1140,30 @@ def agent_details(request):
     }
     return render(request, "a_prm/agent_details.html", context)
 
+# =======================================
+def get_agent_id(request):
+    # =======================================
+    if "GET" == request.method:
+        return render(request, 'a_prm/get_agent_id.html', {})
+
+    id_number = request.POST.get("id_number").strip()
+    id_numbers = built_in_list(id_number)
+
+    # id_numbers = "('{0}')".format("','".join(map(str, rows)))
+
+    id_list = []
+    for order_action_id in id_numbers:
+        print(f'inputting order_action_id {order_action_id}')
+        service_id, agent_id = get_agent_id_from_oms(order_action_id)
+        if agent_id:
+            id_list.append((service_id, order_action_id, agent_id))
+        
+    context = {
+        "title": "Agent IDs",
+        "agent_ids": id_list
+    }
+    return render(request, "a_prm/get_agent_id.html", context)
+    
 
 # =======================================
 def msisdn_details(request):
@@ -1106,7 +1176,7 @@ def msisdn_details(request):
     full_content = request.POST.get('full_content', False)
 
     query = f"""SELECT edr_id, msisdn, old_msisdn, order_action_id, trans_type,  effective_date, expiration_date, sys_creation_date, sim_seq_num, ser_type, 
-                offer_code, deal_id, dealer_code, comm_mdcode, comm_sdcode, comm_rocode
+                offer_code, deal_id, sub_dealer_code, dealer_code, comm_mdcode, comm_sdcode, comm_rocode
                  FROM dms_actv_dtl WHERE msisdn = '{msisdn}' 
                 AND order_action_Id != 'BULKCEASE90' 
                 ORDER BY TO_NUMBER(order_action_id) DESC, expiration_date desc, edr_id DESC"""
@@ -1118,7 +1188,8 @@ def msisdn_details(request):
 
     if full_content:
         err_query = f"""SELECT edr_id, iecd event_type, get_adu_value(adu, '0095') order_action_id, qual_param_2_val trans_type, TRIM(future_12) new_msisdn, 
-        session_id sim_seq_num, future_11 new_sim_seq_num, dominant_err_cd, event_start_datetime, future_1, qual_param_1_val ser_type, qual_param_3_val offer_code, qual_param_4_val deal_id
+        session_id sim_seq_num, future_11 new_sim_seq_num, dominant_err_cd, event_start_datetime, future_1, qual_param_1_val ser_type, qual_param_3_val offer_code, 
+        qual_param_4_val deal_id, TRIM(nr_param_1_val) agent_id
         FROM prm_dat_err_mngr WHERE TRIM(originating_id) = '{msisdn}'"""
 
         cursor.execute(err_query)
@@ -1312,7 +1383,7 @@ def recycle_errors(request):
     else:
         messages.success(request, 'There was a a problem with the PRMERRCRECTR job run!')
 
-    return render(request, 'a_prm/recycle_errors.html')
+    return redirect(request, 'a_prm/activity_count.html')
 
 
 # --------------------------

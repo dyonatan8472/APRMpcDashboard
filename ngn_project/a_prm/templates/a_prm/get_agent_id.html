@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}Get Agent ID{% endblock title %}
+{% block body_block %}
+<div class="container">
+    <div class="jumbotron text-center">
+        <h1>Get Agent ID from OMS</h1>
+        <hr>
+        <h2>Please enter the order action ID(s)</h2>
+        </br>
+
+        <form action="{% url "a_prm:get_agent_id" %}" method="POST">
+            {% csrf_token %}
+            <textarea class="form-control input-sm" rows="2" id="id_number" name="id_number" required="required" autofocus></textarea>
+
+            <hr>
+            <input type="submit" value="GO!">
+        </form>
+    </div>
+</div>
+
+    <div class="container">
+            {% if agent_ids %}
+                <div class="container">
+                    <div class="jumbotron">
+                    <h1>Agent IDs</h1>
+                </div>
+            </div>
+
+            <table WIDTH='100%' BORDER='1'>
+                <tr bgcolor="#808080">
+                    <th align="center">Service ID</th>
+                    <th align="center">Order Action ID</th>
+                    <th align="center">Agent ID</th>
+                </tr>
+                {% for service_id, order_action_id, agent_id in agent_ids %}
+                    <tr>
+                        <td align="left">{{ service_id }}</td>
+                        <td align="left">{{ order_action_id }}</td>
+                        <td align="left">{{ agent_id }}</td>
+                    </tr>
+                {% endfor %}
+            </table>
+
+            {% else %}
+            <h1>No Data Found</h1>
+            {% endif %}
+            </table>
+            <br/>
+    </div>
+
+
+{% endblock %}

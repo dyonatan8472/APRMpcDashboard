@@ -1,4 +1,5 @@
 {% url 'index' as path_to_index %}
+{% url 'a_prm:daemon_status' as path_to_daemon_status %}
 {% url 'a_prm:monitor_processing' as path_to_monitor_processing %}
 {% url 'a_prm:activity_count' as path_to_activity_count %}
 {% url 'a_prm:report_server_jobs' as path_to_report_server_jobs %}
@@ -14,96 +15,100 @@
 {% url 'a_prm:dm40_update' as path_to_dm40_update %}
 {% url 'a_prm:dm27_update' as path_to_dm27_update %}
 {% url 'a_prm:agent_details' as path_to_agent_details %}
+{% url 'a_prm:get_agent_id' as path_to_get_agent_id %}
 {% url 'a_prm:msisdn_details' as path_to_msisdn_details %}
 {% url 'a_prm:missing_offers_ids' as path_to_missing_offers_ids %}
 
 <!-- <nav class="navbar fixed-top navbar-expand-lg navbar-dark bg-success"> -->
-    <nav class="navbar fixed-top navbar-expand-lg navbar-dark" style="background-color: #11161a;">
+<nav class="navbar fixed-top navbar-expand-lg navbar-dark" style="background-color: #11161a;">
+  <a class="nav-link {% if request.path == path_to_index %}active{% endif %}" href="{% url 'index' %}">APRM Dashboard</a>
 
-    <a class="nav-link {% if request.path == path_to_index %}active{% endif %}"  href="{% url 'index' %}">APRM Dashboard</a>
+  <button class="navbar-toggler" data-toggle="collapse" data-target="#navbarNavDropdown"><span class="navbar-toggler-icon"></span></button>
+  <div class="collapse navbar-collapse" id="navbarNavDropdown">
+    <ul class="navbar-nav mr-auto">
+      <li class="nav-item">
+        <a class="nav-link {% if request.path == path_to_daemon_status %}active{% endif %}" href="{% url 'a_prm:daemon_status' %}">Daemon Status</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link {% if request.path == path_to_monitor_processing %}active{% endif %}" href="{% url 'a_prm:monitor_processing' %}">Process Monitor</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link {% if request.path == path_to_activity_count %}active{% endif %}" href="{% url 'a_prm:activity_count' %}">Activity Count</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link {% if request.path == path_report_server_jobs %}active{% endif %}" href="{% url 'a_prm:report_server_jobs' %}">Report Server Jobs</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link {% if request.path == path_to_aprm_error_count %}active{% endif %}" href="{% url 'a_prm:aprm_error_count' %}">APRM Error Count</a>
+      </li>
+      <li class="nav-item dropdown">
+        <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">Reports Download</a>
+        <div class="dropdown-menu">
+          <a href="{% url 'a_prm:detail_error_report' %}" class="dropdown-item">Detail Error Report</a>
+          <a href="{% url 'a_prm:dms_detail_report' %}" class="dropdown-item">DML Detail Report</a>
+          <a href="{% url 'a_prm:actv_detail_report' %}" class="dropdown-item">ACTV Detail Report</a>
+          <a href="{% url 'a_prm:prus_detail_report' %}" class="dropdown-item">PRUS Detail Report</a>
+          <a href="{% url 'a_prm:usage_report' %}" class="dropdown-item">Usage Report</a>
+          <a href="{% url 'a_prm:missing_offers_ids' %}" class="dropdown-item">Missing Offer Codes and Deal IDs</a>
+        </div>
+      </li>
+      <li class="nav-item dropdown">
+        <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">Agent Queries</a>
+        <div class="dropdown-menu">
+          <a href="{% url 'a_prm:agent_details' %}" class="dropdown-item">Agent Details</a>
+          <a href="{% url 'a_prm:get_agent_id' %}" class="dropdown-item">Get Agent id</a>
+        </div>
+      </li>
+      {% if user.is_authenticated %}
 
-    <button class="navbar-toggler" data-toggle="collapse" data-target="#navbarNavDropdown">
-            <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="navbarNavDropdown">
-        <ul class="navbar-nav mr-auto">
-            <li class="nav-item">
-                <a class="nav-link {% if request.path == path_to_monitor_processing %}active{% endif %}"
-                    href="{% url 'a_prm:monitor_processing' %}">Process Monitor</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link {% if request.path == path_to_activity_count %}active{% endif %}"
-                    href="{% url 'a_prm:activity_count' %}">Activity Count</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link {% if request.path == path_report_server_jobs %}active{% endif %}"
-                    href="{% url 'a_prm:report_server_jobs' %}">Report Server Jobs</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link {% if request.path == path_to_aprm_error_count %}active{% endif %}" href="{% url 'a_prm:aprm_error_count' %}">APRM Error Count</a>
-            </li>
-            <li class="nav-item dropdown">
-                <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">Reports Download</a>
-                <div class="dropdown-menu">
-                    <a href="{% url 'a_prm:detail_error_report' %}" class="dropdown-item">Detail Error Report</a>
-                    <a href="{% url 'a_prm:dms_detail_report' %}" class="dropdown-item">DML Detail Report</a>
-                    <a href="{% url 'a_prm:actv_detail_report' %}" class="dropdown-item">ACTV Detail Report</a>
-                    <a href="{% url 'a_prm:prus_detail_report' %}" class="dropdown-item">PRUS Detail Report</a>
-                    <a href="{% url 'a_prm:usage_report' %}" class="dropdown-item">Usage Report</a>
-                    <a href="{% url 'a_prm:missing_offers_ids' %}" class="dropdown-item">Missing Offer Codes and Deal IDs</a>
-                </div>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link {% if request.path == path_to_agent_details %}active{% endif %}" href="{% url 'a_prm:agent_details' %}">Agent Details</a>
-            </li>
-                <li class="nav-item dropdown">
-                    <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">Error Management</a>
-                    <div class="dropdown-menu">
-                        <a href="{% url 'a_prm:purge_errors' %}" class="dropdown-item">Purge Errors</a>
-                        <a href="{% url 'a_prm:purge_dm73_by_msisdn' %}" class="dropdown-item">Purge DM73 By MSISDN</a>
-                        <a href="{% url 'a_prm:dm40_update' %}" class="dropdown-item">DM40 Update</a>
-                        <a href="{% url 'a_prm:recycle_errors' %}" class="dropdown-item">Run recycle Job</a>
-                    </div>    
-                </li>
-                <li class="nav-item dropdown">
-                    <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">LTE Uploads</a>
-                    <div class="dropdown-menu">
-                        <a href="{% url 'a_prm:load_dealers' %}" class="dropdown-item">Deal Dealer Map Upload</a>
-                        <a href="{% url 'a_prm:load_deals' %}" class="dropdown-item">Deals Upload</a>
-                        <a href="{% url 'a_prm:load_cib' %}" class="dropdown-item">CIB Upload</a>
-                        <a href="{% url 'a_prm:load_rib' %}" class="dropdown-item">RIB Upload</a>
-                    </div>
-                </li>
+      <li class="nav-item dropdown">
+        <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">Error Management</a>
+        <div class="dropdown-menu">
+          <a href="{% url 'a_prm:purge_errors' %}" class="dropdown-item">Purge Errors</a>
+          <a href="{% url 'a_prm:purge_dm73_by_msisdn' %}" class="dropdown-item">Purge DM73 By MSISDN</a>
+          <a href="{% url 'a_prm:dm40_update' %}" class="dropdown-item">DM40 Update</a>
+          <a href="{% url 'a_prm:recycle_errors' %}" class="dropdown-item">Run recycle Job</a>
+        </div>
+      </li>
+      <li class="nav-item dropdown">
+        <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">LTE Uploads</a>
+        <div class="dropdown-menu">
+          <a href="{% url 'a_prm:load_dealers' %}" class="dropdown-item">Deal Dealer Map Upload</a>
+          <a href="{% url 'a_prm:load_deals' %}" class="dropdown-item">Deals Upload</a>
+          <a href="{% url 'a_prm:load_cib' %}" class="dropdown-item">CIB Upload</a>
+          <a href="{% url 'a_prm:load_rib' %}" class="dropdown-item">RIB Upload</a>
+        </div>
+      </li>
 
-            <li class="nav-item dropdown">
-                    <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">ACTV Utils</a>
-                    <div class="dropdown-menu">
-                        <a href="{% url 'a_prm:update_dealers' %}" class="dropdown-item">Update Dealers In ACTV</a>
-                        <a href="{% url 'a_prm:update_rech_event_dealers' %}" class="dropdown-item">Update Rech Event Dealers </a>
-                    </div>
-                </li>
-
-            <li class="nav-item">
-                <form class="form-inline" method="post" action="{% url 'a_prm:msisdn_details' %}">
-                {% csrf_token %}
-                    <input class="form-control mr-sm-2" id="msisdn" name="msisdn" required="required" type="search" placeholder="msisdn" aria-label="Search" name="search_query">
-                    <div class="form-check ml-2">
-                    <input class="form-check-input" type="checkbox" id="full_content" name="full_content">
-                </div>
-                    <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
-                </form>
-            </li>
-
-            <li class="nav-item">
-            {% if user.is_authenticated %}
-                <a class="nav-link"  href="{% url 'logout' %}">Logout</a>
-            {% else %}
-                <a class="nav-link"  href="{% url 'login' %}">Login</a>
+      <li class="nav-item dropdown">
+        <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">ACTV Utils</a>
+        <div class="dropdown-menu">
+          <a href="{% url 'a_prm:update_dealers' %}" class="dropdown-item">Update Dealers In ACTV</a>
+          <a href="{% url 'a_prm:update_rech_event_dealers' %}" class="dropdown-item">Update Rech Event Dealers</a>
+        </div>
+      </li>
             {% endif %}
-            </li>
 
-        </ul>
-    </div>
+      <li class="nav-item">
+        <form class="form-inline" method="post" action="{% url 'a_prm:msisdn_details' %}">
+          {% csrf_token %}
+          <input class="form-control mr-sm-2" id="msisdn" name="msisdn" required="required" type="search" placeholder="msisdn" aria-label="Search" name="search_query" />
+          <div class="form-check ml-2">
+            <input class="form-check-input" type="checkbox" id="full_content" name="full_content" />
+          </div>
+          <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+        </form>
+      </li>
+
+      <li class="nav-item">
+        {% if user.is_authenticated %}
+          <a class="nav-link" href="{% url 'logout' %}">Logout</a>
+        {% else %}
+          <a class="nav-link" href="{% url 'login' %}">Login</a>
+        {% endif %}
+      </li>
+    </ul>
+  </div>
 </nav>
 
-<br><br>
+<br /><br />

@@ -86,7 +86,7 @@ DATABASES = {
         'HOST': 'tcenhvbssprd128.telkom.co.za',
         'PORT': '1527',
     },
-        'aprm': {
+    'aprm': {
         'ENGINE':   'django.db.backends.oracle',
         'NAME':     'prdprm',
         'USER':     'APRMAPPC',
@@ -94,13 +94,20 @@ DATABASES = {
         'HOST': 'tcenhvbssprd128.telkom.co.za',
         'PORT': '1527',
     },
-
     'aprmo': {
         'ENGINE':   'django.db.backends.oracle',
         'NAME':     'prdprm',
         'USER':     'APRMAPPO',
         'PASSWORD': 'APRMAPPO',
         'HOST': 'tcenhvbssprd128.telkom.co.za',
+        'PORT': '1527',
+    },
+    'readoms': {
+        'ENGINE':   'django.db.backends.oracle',
+        'NAME':     'prdoms',
+        'USER':     'READOMS',
+        'PASSWORD': 'READOMS',
+        'HOST': 'tcenhvbssprd127.telkom.co.za',
         'PORT': '1527',
     },
     'refwork': {
@@ -119,7 +126,7 @@ DATABASES = {
         'HOST': 'tcenhvbssprd128.telkom.co.za',
         'PORT': '1527',
     },
-    'xaprmseco': {
+    'xprmseco': {
         'ENGINE':   'django.db.backends.oracle',
         'NAME':     'prdprm',
         'USER':     'xaprmseco',
@@ -127,7 +134,6 @@ DATABASES = {
         'HOST': 'tcenhvbssprd128.telkom.co.za',
         'PORT': '1527',
     },
-
 }
 
 
