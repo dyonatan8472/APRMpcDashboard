@@ -1186,16 +1186,24 @@ def msisdn_details(request):
     cursor.execute(query)
     msisdn_output = cursor.fetchall()
 
-    if full_content:
-        err_query = f"""SELECT edr_id, iecd event_type, get_adu_value(adu, '0095') order_action_id, qual_param_2_val trans_type, TRIM(future_12) new_msisdn, 
-        session_id sim_seq_num, future_11 new_sim_seq_num, dominant_err_cd, event_start_datetime, future_1, qual_param_1_val ser_type, qual_param_3_val offer_code, 
-        qual_param_4_val deal_id, TRIM(nr_param_1_val) agent_id
-        FROM prm_dat_err_mngr WHERE TRIM(originating_id) = '{msisdn}'"""
+    # if full_content:
+    #     err_query = f"""SELECT edr_id, iecd event_type, get_adu_value(adu, '0095') order_action_id, qual_param_2_val trans_type, TRIM(future_12) new_msisdn, 
+    #     session_id sim_seq_num, future_11 new_sim_seq_num, dominant_err_cd, event_start_datetime, future_1, qual_param_1_val ser_type, qual_param_3_val offer_code, 
+    #     qual_param_4_val deal_id, TRIM(nr_param_1_val) agent_id
+    #     FROM prm_dat_err_mngr WHERE TRIM(originating_id) = '{msisdn}'"""
 
-        cursor.execute(err_query)
-        err_output = cursor.fetchall()
-    else:
-        err_output = None
+    #     cursor.execute(err_query)
+    #     err_output = cursor.fetchall()
+    # else:
+    #     err_output = None
+
+    err_query = f"""SELECT edr_id, iecd event_type, get_adu_value(adu, '0095') order_action_id, qual_param_2_val trans_type, TRIM(future_12) new_msisdn, 
+    session_id sim_seq_num, future_11 new_sim_seq_num, dominant_err_cd, event_start_datetime, future_1, qual_param_1_val ser_type, qual_param_3_val offer_code, 
+    qual_param_4_val deal_id, TRIM(nr_param_1_val) agent_id
+    FROM prm_dat_err_mngr WHERE TRIM(originating_id) = '{msisdn}'"""
+
+    cursor.execute(err_query)
+    err_output = cursor.fetchall()
 
     context = {
         "title": "MSISDN details",
@@ -1383,7 +1391,7 @@ def recycle_errors(request):
     else:
         messages.success(request, 'There was a a problem with the PRMERRCRECTR job run!')
 
-    return redirect(request, 'a_prm/activity_count.html')
+    return render(request, 'a_prm/recycle_errors.html')
 
 
 # --------------------------
