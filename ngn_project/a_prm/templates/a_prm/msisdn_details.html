@@ -9,8 +9,8 @@
 </div>
 
 <div class="container">
-     <div class="row">
-            <div class="col">
+    <div class="row">
+        <div class="col">
            {% if msisdn_details %}
 
             <table class="table table-striped table-bordered table-hover">
@@ -92,7 +92,7 @@
                         <td align="left">{{ new_sim_seq_num }}</td>
                         <td align="left">{{ dominant_err_cd }}</td>
                         <td style="white-space: nowrap" align="center">{{ event_start_datetime|date:"d-m-Y H:i:s" }}</td>
-                        <td align="center">{{ agent_id }}</td>
+                        <td align="left">{{ agent_id }}</td>
                         <td align="center">{{ dealer_cd }}</td>
                         <td align="center">{{ ser_type }}</td>
                         <td align="left">{{ offer_code }}</td>

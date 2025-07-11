@@ -1179,7 +1179,7 @@ def msisdn_details(request):
                 offer_code, deal_id, sub_dealer_code, dealer_code, comm_mdcode, comm_sdcode, comm_rocode
                  FROM dms_actv_dtl WHERE msisdn = '{msisdn}' 
                 AND order_action_Id != 'BULKCEASE90' 
-                ORDER BY TO_NUMBER(order_action_id) DESC, expiration_date desc, edr_id DESC"""
+                ORDER BY LPAD(order_action_id, 20, ' ') DESC, expiration_date desc, edr_id DESC"""
 
     cursor = connections['default'].cursor()
 
@@ -1197,10 +1197,10 @@ def msisdn_details(request):
     # else:
     #     err_output = None
 
-    err_query = f"""SELECT edr_id, iecd event_type, get_adu_value(adu, '0095') order_action_id, qual_param_2_val trans_type, TRIM(future_12) new_msisdn, 
-    session_id sim_seq_num, future_11 new_sim_seq_num, dominant_err_cd, event_start_datetime, future_1, qual_param_1_val ser_type, qual_param_3_val offer_code, 
-    qual_param_4_val deal_id, TRIM(nr_param_1_val) agent_id
-    FROM prm_dat_err_mngr WHERE TRIM(originating_id) = '{msisdn}'"""
+    err_query = f"""SELECT edr_id, iecd event_type, get_adu_value(adu, '0095') order_action_id, qual_param_2_val trans_type, 
+    TRIM(future_12) new_msisdn, session_id sim_seq_num, future_11 new_sim_seq_num, dominant_err_cd, event_start_datetime, future_1, 
+    qual_param_1_val ser_type, qual_param_3_val offer_code, qual_param_4_val deal_id, TRIM(nr_param_1_val) agent_id
+    FROM prm_dat_err_mngr WHERE TRIM(originating_id) = '{msisdn}' ORDER BY LPAD(get_adu_value(adu, '0095'),4000,' ') DESC"""
 
     cursor.execute(err_query)
     err_output = cursor.fetchall()
