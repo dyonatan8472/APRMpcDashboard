@@ -80,8 +80,10 @@
                     <th align="center">Service Type</th>
                     <th align="center">Offer Code</th>
                     <th align="center">Deal ID</th>
+                    <th align="center">Insert Date</th>
+                    <th align="center">Counter</th>
                 </tr>
-                {% for edr_id, event_type, order_action_id, trans_type, new_msisdn, sim_seq_num, new_sim_seq_num, dominant_err_cd, event_start_datetime, dealer_cd, ser_type, offer_code, deal_id, agent_id in err_details %}
+                {% for edr_id, event_type, order_action_id, trans_type, new_msisdn, sim_seq_num, new_sim_seq_num, dominant_err_cd, event_start_datetime, dealer_cd, ser_type, offer_code, deal_id, agent_id, ins_date, recycle_cntr in err_details %}
                     <tr>
                         <td align="left">{{ edr_id }}</td>
                         <td align="left">{{ event_type }}</td>
@@ -97,6 +99,8 @@
                         <td align="center">{{ ser_type }}</td>
                         <td align="left">{{ offer_code }}</td>
                         <td align="left">{{ deal_id }}</td>
+                        <td style="white-space: nowrap" align="center">{{ ins_date|date:"d-m-Y H:i:s" }}</td>
+                        <td align="center">{{ recycle_cntr }}</td>
                     </tr>
                 {% endfor %}
             </table>
