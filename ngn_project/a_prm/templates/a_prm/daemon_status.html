@@ -11,6 +11,8 @@
     <div class="container">
         <p>Last Refresh time: {{ current_datetime }}</p>
 
+        <p>{{ cpu_usage }}</p>
+        <p>{{ memory_usage }}</p>
         <p>Current disk usage is: {{ disk_usage }}%</p>
         {% if number_of_fins == 0 %}
 

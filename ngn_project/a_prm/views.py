@@ -1199,7 +1199,7 @@ def msisdn_details(request):
 
     err_query = f"""SELECT edr_id, iecd event_type, get_adu_value(adu, '0095') order_action_id, qual_param_2_val trans_type, 
     TRIM(future_12) new_msisdn, session_id sim_seq_num, future_11 new_sim_seq_num, dominant_err_cd, event_start_datetime, future_1, 
-    qual_param_1_val ser_type, qual_param_3_val offer_code, qual_param_4_val deal_id, TRIM(nr_param_1_val) agent_id
+    qual_param_1_val ser_type, qual_param_3_val offer_code, qual_param_4_val deal_id, TRIM(nr_param_1_val) agent_id, ins_date, recycle_cntr
     FROM prm_dat_err_mngr WHERE TRIM(originating_id) = '{msisdn}' ORDER BY LPAD(get_adu_value(adu, '0095'),4000,' ') DESC"""
 
     cursor.execute(err_query)
@@ -1444,6 +1444,18 @@ def daemon_status(request):
     ]
 
     number_of_fins = len(glob.glob('/users/tsa/prdprm1/var/tsa/LSN/input1/*.FIN'))
+    # CPU usage percentage
+    cpu_usage = psutil.cpu_percent(interval=1)   
+    cpu_usage = "CPU Usage: {:.2f}%".format(cpu_usage) 
+
+
+    # Memory usage
+    mem = psutil.virtual_memory()
+    mem_used = mem.used / (1024 ** 3)  # GB
+    mem_total = mem.total / (1024 ** 3)
+    mem_percent = mem.percent
+    memory_usage = "Memory Usage: {:.2f} GB / {:.2f} GB ({:.2f}%)".format(mem_used, mem_total, mem_percent)
+
     disk_usage = get_disk_usage()
 
     processes = get_processes()
@@ -1477,6 +1489,8 @@ def daemon_status(request):
 
     context = {
         "daemon_status": daemon_status_list,
+        "cpu_usage": cpu_usage,
+        "memory_usage": memory_usage,
         "disk_usage": disk_usage,
         "number_of_fins": number_of_fins,
         "current_datetime": current_datetime,
