@@ -25,7 +25,17 @@ import os
 
 USER_NAME = os.environ['USER']
 
+# ---------------------------------
+def get_logical_date():
+# ---------------------------------
+    query = """SELECT logical_date FROM logical_date WHERE expiration_date is null AND logical_date_type = 'B'"""
+    
+    cursor = connections['default'].cursor()
+    cursor.execute(query)
 
+    logical_date = cursor.fetchone()[0]
+
+    return logical_date.strftime("%d-%m-%Y")
 # ---------------------------------
 def get_agent_id_from_oms(order_action_id):
 # ---------------------------------
@@ -1447,7 +1457,7 @@ def daemon_status(request):
     # CPU usage percentage
     cpu_usage = psutil.cpu_percent(interval=1)   
     cpu_usage = "CPU Usage: {:.2f}%".format(cpu_usage) 
-
+    logical_date = get_logical_date()
 
     # Memory usage
     mem = psutil.virtual_memory()
@@ -1489,6 +1499,7 @@ def daemon_status(request):
 
     context = {
         "daemon_status": daemon_status_list,
+        "logical_date": logical_date,
         "cpu_usage": cpu_usage,
         "memory_usage": memory_usage,
         "disk_usage": disk_usage,
