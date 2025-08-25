@@ -36,12 +36,63 @@ def get_logical_date():
     logical_date = cursor.fetchone()[0]
 
     return logical_date.strftime("%d-%m-%Y")
+
+# ---------------------------------
+def get_xml_id_info(xml_id):
+# ---------------------------------
+    """Get msisdn and order action id from OMS XML using xml_id"""
+
+    query = f"""SELECT xml_content FROM tb_xml WHERE xml_id = '{xml_id}'"""
+
+    cursor = connections['readoms'].cursor()
+    cursor.execute(query)
+    try:
+        blob = cursor.fetchone()[0]
+    except TypeError:
+        return 'Dummy', 'Dummy'
+
+    if blob:
+        blob_bytes = blob.read()
+        start_index = blob_bytes.find(b"<?xml")
+
+        if start_index != -1:
+            cleaned_bytes = blob_bytes[start_index:]
+            xml_data = cleaned_bytes.decode("utf-8")
+        else:
+            raise ValueError("XML declaration not found in BLOB")
+
+        # Parse XML
+        root = ET.fromstring(xml_data)
+
+        # Find the DynamicProduct element and extract serviceID
+        dynamic_product = root.find('.//DynamicProduct')
+        
+        if dynamic_product is not None:
+            service_id = dynamic_product.attrib.get('serviceID')
+        else:
+            print("DynamicProduct element not found.")
+
+        order_action = root.find('.//OrderAction')
+
+        if order_action is not None:
+            order_action_id = order_action.attrib.get('ID')
+        else:
+            print("DynamicProduct element not found.")
+            order_action_id = 'cannot find'
+
+    else:
+        print("No BLOB data found.")    
+        return None, None
+
+    return service_id, order_action_id
+
+
+
 # ---------------------------------
 def get_agent_id_from_oms(order_action_id):
 # ---------------------------------
     """Get the agent id from OMS"""
 
-    print(f'order_action_id: {order_action_id}')
     query = f"""SELECT item.service_id, xml.xml_content FROM tborder_action tboa 
             JOIN tb_xml xml on xml.xml_id = tboa.xml_id JOIN tbap_item item ON item.ap_id = tboa.ap_id WHERE order_unit_id = '{order_action_id}'
             ORDER BY LPAD(item.order_action_id, 20, ' ') DESC, item.ctdb_cre_datetime DESC"""
@@ -1174,6 +1225,31 @@ def get_agent_id(request):
     }
     return render(request, "a_prm/get_agent_id.html", context)
     
+# =======================================
+def get_xml_id(request):
+# =======================================
+    if "GET" == request.method:
+        return render(request, 'a_prm/xml_id_details.html', {})
+
+    id_number = request.POST.get("id_number").strip()
+    id_numbers = built_in_list(id_number)
+
+    # id_numbers = "('{0}')".format("','".join(map(str, rows)))
+
+    id_list = []
+    for xml_id in id_numbers:
+
+        service_id, order_action_id = get_xml_id_info(xml_id)
+        if xml_id:
+            if not order_action_id:
+                order_action_id = 'not there'
+            id_list.append((xml_id, service_id, order_action_id))
+        
+    context = {
+        "title": "xml IDs",
+        "xml_ids": id_list
+    }
+    return render(request, "a_prm/xml_id_details.html", context)
 
 # =======================================
 def msisdn_details(request):

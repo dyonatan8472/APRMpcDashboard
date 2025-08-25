@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}Get XML ID{% endblock title %}
+{% block body_block %}
+<div class="container">
+    <div class="jumbotron text-center">
+        <h1>Get OMS XML ID Info</h1>
+        <hr>
+        <h2>Please enter the XML ID(s)</h2>
+        </br>
+
+        <form action="{% url "a_prm:get_xml_id" %}" method="POST">
+            {% csrf_token %}
+            <textarea class="form-control input-sm" rows="2" id="id_number" name="id_number" required="required" autofocus></textarea>
+
+            <hr>
+            <input type="submit" value="GO!">
+        </form>
+    </div>
+</div>
+
+    <div class="container">
+            {% if xml_ids %}
+                <div class="container">
+                    <div class="jumbotron">
+                    <h1>XML IDs</h1>
+                </div>
+            </div>
+
+            <table WIDTH='100%' BORDER='1'>
+                <tr bgcolor="#808080">
+                    <th align="center">XML ID</th>
+                    <th align="center">Service ID</th>
+                    <th align="center">Order Action ID</th>
+                </tr>
+                {% for xml_id, service_id, order_action_id in xml_ids %}
+                    <tr>
+                        <td align="left">{{ xml_id }}</td>
+                        <td align="left">{{ service_id }}</td>
+                        <td align="left">{{ order_action_id }}</td>
+                    </tr>
+                {% endfor %}
+            </table>
+
+            {% else %}
+            <h1>No Data Found</h1>
+            {% endif %}
+            </table>
+            <br/>
+    </div>
+
+
+{% endblock %}

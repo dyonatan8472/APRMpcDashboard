@@ -3,7 +3,7 @@ from django.conf.urls import include, url
 from .views import (monitor_processing, load_dealers, load_deals, load_cib, load_rib, update_dealers, update_rech_event_dealers, purge_errors,
                     purge_dm73_by_msisdn, dms_detail_report, dm69_update, agent_details, delete_dealer, actv_detail_report,
                     prus_detail_report, aprm_error_count, detail_error_report, dm40_update, dm27_update,recycle_errors, daemon_status,
-                    missing_offers_ids, activity_count, usage_report, report_server_jobs, msisdn_details, get_agent_id)
+                    missing_offers_ids, activity_count, usage_report, report_server_jobs, msisdn_details, get_agent_id, get_xml_id)
 
 app_name = 'a_prm'
 
@@ -31,6 +31,9 @@ urlpatterns = [
     url(r'^usage_report/$', usage_report, name='usage_report'),
     url(r'^agent_details/$', agent_details, name='agent_details'),
     url(r'^get_agent_id/$', get_agent_id, name='get_agent_id'),
+
+    url(r'^get_xml_id/$', get_xml_id, name='get_xml_id'),
+
     url(r'^delete_dealer/$', delete_dealer, name='delete_dealer'),
     url(r'^missing_offers_ids/$', missing_offers_ids, name='missing_offers_ids'),
     url(r'^msisdn_details/$', msisdn_details, name='msisdn_details'),

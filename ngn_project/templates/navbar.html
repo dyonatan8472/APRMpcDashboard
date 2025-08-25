@@ -16,6 +16,7 @@
 {% url 'a_prm:dm27_update' as path_to_dm27_update %}
 {% url 'a_prm:agent_details' as path_to_agent_details %}
 {% url 'a_prm:get_agent_id' as path_to_get_agent_id %}
+{% url 'a_prm:get_xml_id' as path_to_get_xml_id %}
 {% url 'a_prm:msisdn_details' as path_to_msisdn_details %}
 {% url 'a_prm:missing_offers_ids' as path_to_missing_offers_ids %}
 
@@ -57,6 +58,7 @@
         <div class="dropdown-menu">
           <a href="{% url 'a_prm:agent_details' %}" class="dropdown-item">Agent Details</a>
           <a href="{% url 'a_prm:get_agent_id' %}" class="dropdown-item">Get Agent id</a>
+          <a href="{% url 'a_prm:get_xml_id' %}" class="dropdown-item">Get XML id info</a>
         </div>
       </li>
       {% if user.is_authenticated %}
