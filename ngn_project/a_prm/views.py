@@ -49,7 +49,7 @@ def get_xml_id_info(xml_id):
     try:
         blob = cursor.fetchone()[0]
     except TypeError:
-        return 'Dummy', 'Dummy'
+        return None, None
 
     if blob:
         blob_bytes = blob.read()
@@ -78,7 +78,6 @@ def get_xml_id_info(xml_id):
             order_action_id = order_action.attrib.get('ID')
         else:
             print("DynamicProduct element not found.")
-            order_action_id = 'cannot find'
 
     else:
         print("No BLOB data found.")    
@@ -1242,7 +1241,7 @@ def get_xml_id(request):
         service_id, order_action_id = get_xml_id_info(xml_id)
         if xml_id:
             if not order_action_id:
-                order_action_id = 'not there'
+                order_action_id = None
             id_list.append((xml_id, service_id, order_action_id))
         
     context = {
