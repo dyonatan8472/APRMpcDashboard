@@ -39,9 +39,9 @@
                         <td align="left">{{ old_msisdn }}</td>
                         <td align="left">{{ order_action_id }}</td>
                         <td align="center">{{ trans_type }}</td>
-                        <td style="white-space: nowrap" align="center">{{ effective_date|date:"d-m-Y H:i:s" }}</td>
-                        <td style="white-space: nowrap" align="center">{{ expiration_date|date:"d-m-Y H:i:s" }}</td>
-                        <td style="white-space: nowrap" align="center">{{ sys_creation_date|date:"d-m-Y H:i:s" }}</td>
+                        <td style="white-space: nowrap" align="center">{{ effective_date|date:"d-M-Y H:i:s" }}</td>
+                        <td style="white-space: nowrap" align="center">{{ expiration_date|date:"d-M-Y H:i:s" }}</td>
+                        <td style="white-space: nowrap" align="center">{{ sys_creation_date|date:"d-M-Y H:i:s" }}</td>
                         <td align="left">{{ sim_seq_num }}</td>
                         <td align="center">{{ ser_type }}</td>
                         <td align="left">{{ offer_code }}</td>
@@ -93,13 +93,13 @@
                         <td align="left">{{ sim_seq_num }}</td>
                         <td align="left">{{ new_sim_seq_num }}</td>
                         <td align="left">{{ dominant_err_cd }}</td>
-                        <td style="white-space: nowrap" align="center">{{ event_start_datetime|date:"d-m-Y H:i:s" }}</td>
+                        <td style="white-space: nowrap" align="center">{{ event_start_datetime|date:"d-M-Y H:i:s" }}</td>
                         <td align="left">{{ agent_id }}</td>
                         <td align="center">{{ dealer_cd }}</td>
                         <td align="center">{{ ser_type }}</td>
                         <td align="left">{{ offer_code }}</td>
                         <td align="left">{{ deal_id }}</td>
-                        <td style="white-space: nowrap" align="center">{{ ins_date|date:"d-m-Y H:i:s" }}</td>
+                        <td style="white-space: nowrap" align="center">{{ ins_date|date:"d-M-Y H:i:s" }}</td>
                         <td align="center">{{ recycle_cntr }}</td>
                     </tr>
                 {% endfor %}
