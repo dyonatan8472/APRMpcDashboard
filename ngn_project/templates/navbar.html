@@ -56,9 +56,9 @@
       <li class="nav-item dropdown">
         <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">Agent Queries</a>
         <div class="dropdown-menu">
-          <a href="{% url 'a_prm:agent_details' %}" class="dropdown-item">Agent Details</a>
-          <a href="{% url 'a_prm:get_agent_id' %}" class="dropdown-item">Get Agent id</a>
-          <a href="{% url 'a_prm:get_xml_id' %}" class="dropdown-item">Get XML id info</a>
+          <a href="{% url 'a_prm:agent_details' %}" class="dropdown-item">APRM Agent Details</a>
+          <a href="{% url 'a_prm:get_agent_id' %}" class="dropdown-item">Get Agent id with oa_id</a>
+          <a href="{% url 'a_prm:get_xml_id' %}" class="dropdown-item">Get XML info with xml id</a>
         </div>
       </li>
       {% if user.is_authenticated %}

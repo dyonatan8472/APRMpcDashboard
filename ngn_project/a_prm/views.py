@@ -65,12 +65,9 @@ def get_xml_id_info(xml_id):
         root = ET.fromstring(xml_data)
 
         # Find the DynamicProduct element and extract serviceID
-        dynamic_product = root.find('.//DynamicProduct')
-        
-        if dynamic_product is not None:
-            service_id = dynamic_product.attrib.get('serviceID')
-        else:
-            print("DynamicProduct element not found.")
+        # Find service_id value
+        msisdn = root.find(".//ItemProperty[@propertyName='MSISDN_Number']")
+        service_id = msisdn.attrib.get("value") if msisdn is not None else None
 
         order_action = root.find('.//OrderAction')
 
