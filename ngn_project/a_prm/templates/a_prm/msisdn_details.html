@@ -23,6 +23,7 @@
                     <th align="center">Expire Date</th>
                     <th align="center">Create Date</th>
                     <th align="center">SIM Number</th>
+                    <th align="center">Application ID</th>
                     <th align="center">Service Type</th>
                     <th align="center">Offer Code</th>
                     <th align="center">Deal ID</th>
@@ -30,7 +31,7 @@
                     <th align="center">Dealer Code</th>
                     
                 </tr>
-                {% for edr_id, msisdn, old_msisdn, order_action_id, trans_type, effective_date, expiration_date, sys_creation_date, sim_seq_num, ser_type, offer_code, deal_id, agent_id, dealer_code, comm_mdcode, comm_sdcode, comm_rocode in msisdn_details %}
+                {% for edr_id, msisdn, old_msisdn, order_action_id, trans_type, effective_date, expiration_date, sys_creation_date, sim_seq_num, application_id,  ser_type, offer_code, deal_id, agent_id, dealer_code, comm_mdcode, comm_sdcode, comm_rocode in msisdn_details %}
                     <tr>
                         {% if '3000' in expiration_date %}
                             <tr style="background: #03fc1c">
@@ -43,6 +44,7 @@
                         <td style="white-space: nowrap" align="center">{{ expiration_date|date:"d-M-Y H:i:s" }}</td>
                         <td style="white-space: nowrap" align="center">{{ sys_creation_date|date:"d-M-Y H:i:s" }}</td>
                         <td align="left">{{ sim_seq_num }}</td>
+                        <td align="center">{{ application_id }}</td>
                         <td align="center">{{ ser_type }}</td>
                         <td align="left">{{ offer_code }}</td>
                         <td align="left">{{ deal_id }}</td>
