@@ -15,12 +15,18 @@
         <p>{{ cpu_usage }}</p>
         <p>{{ memory_usage }}</p>
         <p>Current disk usage is: {{ disk_usage }}%</p>
-        {% if number_of_fins == 0 %}
+        {% if number_of_fins1 == 0 %}
 
             <p>There are currently no FIN files in the input directory</p>
         {% else %}
-            <p>Number of FIN files at input directory: {{ number_of_fins }}</p>
+            <p>Number of FIN files at input1 directory: {{ number_of_fins1 }}</p>
         {% endif %}
+
+        {% if number_of_fins30 %}
+            <p>Number of FIN files at input30 directory: {{ number_of_fins30 }}</p>
+        {% endif %}
+
+
     </div>
 
     <div class="container">

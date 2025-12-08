@@ -1514,7 +1514,8 @@ def daemon_status(request):
         ('UPLOAD_RATED_USAGE_7', 'UPRTUSAGE7', 'UPRTUSAGE7', 'grep'),
     ]
 
-    number_of_fins = len(glob.glob('/users/tsa/prdprm1/var/tsa/LSN/input1/*.FIN'))
+    number_of_fins1 = len(glob.glob('/users/tsa/prdprm1/var/tsa/LSN/input1/*.FIN'))
+    number_of_fins30 = len(glob.glob('/users/tsa/prdprm1/var/tsa/LSN/input30/*.FIN'))
     # CPU usage percentage
     cpu_usage = psutil.cpu_percent(interval=1)   
     cpu_usage = "CPU Usage: {:.2f}%".format(cpu_usage) 
@@ -1564,7 +1565,8 @@ def daemon_status(request):
         "cpu_usage": cpu_usage,
         "memory_usage": memory_usage,
         "disk_usage": disk_usage,
-        "number_of_fins": number_of_fins,
+        "number_of_fins1": number_of_fins1,
+        "number_of_fins30": number_of_fins30,
         "current_datetime": current_datetime,
     }
 
