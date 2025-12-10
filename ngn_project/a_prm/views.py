@@ -13,6 +13,8 @@ from .models import (PrmDatErrMngr, DmsDealDtl, DmsActvDtl, DmsPrepAccUsg, PrmFl
 import xml.etree.ElementTree as ET
 
 import pandas as pd
+import openpyxl
+import io
 import csv
 from zipfile import BadZipFile
 from .utils import built_in_list, bulk_run
@@ -1420,7 +1422,7 @@ def aprm_error_count(request):
 
 
 # =======================================
-def detail_error_report(request):
+def detail_error_report_old(request):
     # =======================================
     model_class = PrmDatErrMngr
 
@@ -1439,6 +1441,37 @@ def detail_error_report(request):
 
     return response
 
+# =======================================
+def detail_error_report(request):
+    # =======================================
+    model_class = PrmDatErrMngr
+
+    meta = model_class._meta
+    field_names = [field.name for field in meta.fields]
+
+    # ============================
+    # Query database
+    qs = model_class.objects.all().values(*field_names)
+
+    # ============================
+    # Convert to pandas DataFrame
+    df = pd.DataFrame(list(qs), columns=field_names)
+    df.columns = df.columns.str.upper()
+    output = io.BytesIO()
+
+    with pd.ExcelWriter(output, engine='openpyxl') as writer:
+        df.to_excel(writer, index=False, sheet_name='Error Report')
+    current_date = dt.datetime.today().strftime("%Y%m%d_%H%M")
+
+    filename = f"detail_error_report_{current_date}.csv"
+
+    response = HttpResponse(
+        output.getvalue(),
+        content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    )
+    response['Content-Disposition'] = f'attachment; filename="{filename}"'
+    
+    return response
 
 # =======================================
 def recycle_errors(request):
