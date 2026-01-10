@@ -1,80 +1,1 @@
-{% extends "base_timer.html" %}
-{% block title %}Process Report{% endblock title %}
-
-{% block body_block %}
-    <div class="container fixed mt-3">
-        <div class="jumbotron text-center">
-            <h1 class="display-4">{{ title }}</h1>
-        </div>
-    </div>
-    
-    <div class="container">
-        <p>Last Refresh time: {{ current_datetime }}</p>
-
-        <div class="row">
-            <div class="col">
-                {% if process_report %}
-                    <table class="table table-striped table-bordered table-hover">
-                        <tr bgcolor="#808080">
-                            <th align="center">ac control</th>
-                            <th align="center">File Status</th>
-                            <th align="center">File Type</th>
-                            <th align="center">Listener Name</th>
-                            <th align="center">Current File Alias</th>
-                            <th align="center">Next Program Name</th>
-                            <th align="center">Next File Alias</th>
-                            <th align="center">Record Count Total</th>
-                            <th align="center">File Count</th>
-                            <th align="center">Minimum File Date</th>
-                            <th align="center">Maximum File Date</th>
-                        </tr>
-                        {% for ac_control, file_status, file_type, lsn_name, cur_file_alias, nxt_pgm_name, nxt_file_alias, rec_total, count, min_file_date, max_file_date in process_report %}
-                            {% if file_status == 'AF' %}
-                                <tr style="background: #db6758">
-                            {% elif file_type == 'MSIS' %}
-                                <tr style="background: #ff69b4">
-                            {% elif file_type == 'ACTV' %}
-                                <tr style="background: #C4C4C4">
-                            {% elif file_type == 'CNTU' %}
-                                <tr style="background: #f54842">
-                            {% elif file_type == 'SISW' %}
-                                <tr style="background: #e342f5">
-                            {% elif file_type == 'RECH' %}
-                                <tr style="background: #34eb58">
-                            {% elif file_type == 'DLID' %}
-                                <tr style="background: #34ebe5">
-                            {% elif file_type == 'PRUS' %}
-                                <tr style="background: #fce303">
-                            {% elif file_type == 'HPUS' %}
-                                <tr style="background: #f57542">
-                            {% elif file_type == 'POUS' %}
-                                <tr style="background: #fcba03">
-                            {% elif file_type == 'WUPR' %}
-                                <tr style="background: #1E90FF">
-                            {% endif %}
-
-                            <td align="left">{{ ac_control }}</td>
-                            <td align="left">{{ file_status }}</td>
-                            <td align="left">{{ file_type }}</td>
-                            <td align="left">{{ lsn_name }}</td>
-                            <td align="left">{{ cur_file_alias }}</td>
-                            <td align="left">{{ nxt_pgm_name }}</td>
-                            <td align="left">{{ nxt_file_alias }}</td>
-                            <td align="center">{{ rec_total }}</td>
-                            <td align="center">{{ count }}</td>
-                            <td style=white-space: nowrap align="left">{{ min_file_date|date:"d-m-Y H:i:s" }}</td>
-                            <td style=white-space: nowrap align="left">{{ max_file_date|date:"d-m-Y H:i:s" }}</td>
-                        </tr>
-                        {% endfor %}
-                    </table>
-                </div>
-
-                {% else %}
-                    <h1>No Data available at present for Process Report!</h1>
-                {% endif %}
-        <br/>
-        </div>
-    </div>
-
-
-{% endblock %}
+{% extends "base_timer.html" %}{% block title %}Process Report{% endblock title %}{% block body_block %}    <div class="container fixed mt-3">        <div class="jumbotron text-center">            <h1 class="display-4">{{ title }}</h1>        </div>    </div>        <div class="container">        <p>Last Refresh time: {{ current_datetime }}</p>        <div class="row">            <div class="col">                {% if process_report %}                    <table class="table table-striped table-bordered table-hover">                        <tr bgcolor="#808080">                            <th align="center">ac control</th>                            <th align="center">File Status</th>                            <th align="center">File Type</th>                            <th align="center">Listener Name</th>                            <th align="center">Current File Alias</th>                            <th align="center">Next Program Name</th>                            <th align="center">Next File Alias</th>                            <th align="center">Record Count Total</th>                            <th align="center">File Count</th>                            <th align="center">Minimum File Date</th>                            <th align="center">Maximum File Date</th>                        </tr>                        {% for ac_control, file_status, file_type, lsn_name, cur_file_alias, nxt_pgm_name, nxt_file_alias, rec_total, count, min_file_date, max_file_date in process_report %}                            {% if file_status == 'AF' %}                                <tr style="background: #db6758">                            {% elif file_type == 'MSIS' %}                                <tr style="background: #ff69b4">                            {% elif file_type == 'ACTV' %}                                <tr style="background: #C4C4C4">                            {% elif file_type == 'CNTU' %}                                <tr style="background: #f54842">                            {% elif file_type == 'SISW' %}                                <tr style="background: #e342f5">                            {% elif file_type == 'RECH' %}                                <tr style="background: #34eb58">                            {% elif file_type == 'DLID' %}                                <tr style="background: #34ebe5">                            {% elif file_type == 'PRUS' %}                                <tr style="background: #fce303">                            {% elif file_type == 'HPUS' %}                                <tr style="background: #f57542">                            {% elif file_type == 'POUS' %}                                <tr style="background: #fcba03">                            {% elif file_type == 'WUPR' %}                                <tr style="background: #1E90FF">                            {% endif %}                            <td align="left">{{ ac_control }}</td>                            <td align="left">{{ file_status }}</td>                            <td align="left">{{ file_type }}</td>                            <td align="left">{{ lsn_name }}</td>                            <td align="left">{{ cur_file_alias }}</td>                            <td align="left">{{ nxt_pgm_name }}</td>                            <td align="left">{{ nxt_file_alias }}</td>                            <td align="center">{{ rec_total }}</td>                            <td align="center">{{ count }}</td>                            <td style=white-space: nowrap align="left">{{ min_file_date|date:"d-m-Y H:i:s" }}</td>                            <td style=white-space: nowrap align="left">{{ max_file_date|date:"d-m-Y H:i:s" }}</td>                        </tr>                        {% endfor %}                    </table>                </div>                {% else %}                    <h1>No Data available at present for Process Report!</h1>                {% endif %}        <br/>        </div>    </div>{% endblock %}

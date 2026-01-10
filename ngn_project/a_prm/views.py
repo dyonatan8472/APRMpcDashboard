@@ -1251,7 +1251,7 @@ def get_xml_id(request):
 
 # =======================================
 def msisdn_details(request):
-    # =======================================
+# =======================================
     if "GET" == request.method:
         return render(request, 'a_prm/msisdn_details.html', {})
 
@@ -1259,7 +1259,7 @@ def msisdn_details(request):
 
     full_content = request.POST.get('full_content', False)
 
-    query = f"""SELECT edr_id, msisdn, old_msisdn, order_action_id, trans_type,  effective_date, expiration_date, sys_creation_date, sim_seq_num, application_id, ser_type, 
+    query = f"""SELECT edr_id, msisdn, old_msisdn, order_action_id, trans_type,  effective_date, expiration_date, billing_period, sys_creation_date, sim_seq_num, application_id, ser_type, 
                 offer_code, deal_id, sub_dealer_code, dealer_code, comm_mdcode, comm_sdcode, comm_rocode
                  FROM dms_actv_dtl WHERE msisdn = '{msisdn}' 
                 AND order_action_Id != 'BULKCEASE90' 
@@ -1272,7 +1272,7 @@ def msisdn_details(request):
 
     err_query = f"""SELECT edr_id, iecd event_type, get_adu_value(adu, '0095') order_action_id, qual_param_2_val trans_type, 
     TRIM(future_12) new_msisdn, session_id sim_seq_num, future_11 new_sim_seq_num, dominant_err_cd, event_start_datetime, future_1, 
-    qual_param_1_val ser_type, qual_param_3_val offer_code, qual_param_4_val deal_id, TRIM(nr_param_1_val) agent_id, ins_date, recycle_cntr
+    qual_param_1_val ser_type, qual_param_3_val offer_code, qual_param_4_val deal_id, TRIM(nr_param_1_val) agent_id, ins_date, rec_handle_ind, recycle_cntr
     FROM prm_dat_err_mngr WHERE TRIM(originating_id) = '{msisdn}' ORDER BY LPAD(get_adu_value(adu, '0095'),4000,' ') DESC"""
 
     cursor.execute(err_query)
@@ -1448,10 +1448,16 @@ def detail_error_report(request):
 
     meta = model_class._meta
     field_names = [field.name for field in meta.fields]
-
+    # field_names = ['ERR_SEQ_NUM', 'SYS_CREATION_DATE', 'SYS_UPDATE_DATE', 'IECD', 'INS_DATE', 'RECYCLE_CNTR', 'DOMINANT_ERR_CD', 'PHY_FILE_ID', 'ORIGINATING_ID', 'TERMINATING_ID', 'EVENT_START_DATETIME',	
+    #                'CARRIER_CD', 'FUTURE_1', 'FUTURE_2', 'FUTURE_3', 'SESSION_ID', 'PROD_CAT_ID', 'PROD_ID', 'EVENT_ID', 'CHRG_PARAM_1_VAL', 'UOM_1', 'NR_PARAM_1_VAL', 'NR_PARAM_2_VAL', 'QUAL_PARAM_1_VAL',	
+    #                'QUAL_PARAM_2_VAL', 'QUAL_PARAM_3_VAL', 'QUAL_PARAM_4_VAL',	'CHRG_DIRECTION', 'RATE_PLAN_CD', 'TAX_SET_CD', 'PROCESS_DATETIME',	'AGREEMENT_ID',	'RERATE_INVCN_CD', 'EVENT_CHRG_TP',	
+    #                'ORIG_CHRG_PARAM_VAL_1',	'USAGE_CHRG_1',	'USAGE_CHRG_3',	'NUM_OF_RATE_SEG', 'NUM_OF_ADU_PARAM', 'SIZE_OF_ADU', 'RATE_SEGMENTS', 'ORIG_PARAM', 'ADU',	'REC_HANDLE_IND', 'NEXT_PROCESS_IND',
+    #                'EDR_ID', 'DUP_PASS_IND', 'CALC_USAGE_CHRG',	'ORIG_PROCESS_DATE', 'FUTURE_5', 'FUTURE_7', 'FUTURE_8', 'FUTURE_10', 'FUTURE_11', 'FUTURE_12', 'FUTURE_13', 'FUTURE_14', 'ACCOUNT_CD',
+    #                'RANK1_ACCOUNT_CD', 'ACCOUNT_TYPE_CD', 'BUSINESS_UNIT_CD',	'ACCOUNT_START_DATE', 'ACCOUNT_END_DATE', 'TENANT_CD', 'CORE_RESERVED_1']
     # ============================
     # Query database
     qs = model_class.objects.all().values(*field_names)
+    # qs = model_class.objects.values_list(field_names)
 
     # ============================
     # Convert to pandas DataFrame
