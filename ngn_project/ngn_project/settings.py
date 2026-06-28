@@ -16,18 +16,18 @@ import os
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 TEMPLATES_DIR = [os.path.join(BASE_DIR, 'templates')]
 
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.11/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'zz=hlwrv5#(o)*^$yh85%1gj16#doimv=j344iv6(u)g)g+x4p'
+SECRET_KEY = 'd9a&1=i6n0+&29p-s8v1y(2p6i9d%xtl352%vri5jt)+%b29hv'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
 ALLOWED_HOSTS = ['127.0.0.1','localhost', 'nbschl029']
 
-#aprm_boss:Aprm_1701
 
 # Application definition
 
@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.humanize',
+    'tc',
     'a_prm',
     'django_tables2',
 ]
@@ -77,66 +78,7 @@ WSGI_APPLICATION = 'ngn_project.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/1.11/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE':   'django.db.backends.oracle',
-        'NAME':     'prdprm',
-        'USER':     'APRMAPPC',
-        'PASSWORD': 'APRMAPPC',
-        'HOST': 'tcenhvbssprd128.telkom.co.za',
-        'PORT': '1527',
-    },
-    'aprm': {
-        'ENGINE':   'django.db.backends.oracle',
-        'NAME':     'prdprm',
-        'USER':     'APRMAPPC',
-        'PASSWORD': 'APRMAPPC',
-        'HOST': 'tcenhvbssprd128.telkom.co.za',
-        'PORT': '1527',
-    },
-    'aprmo': {
-        'ENGINE':   'django.db.backends.oracle',
-        'NAME':     'prdprm',
-        'USER':     'APRMAPPO',
-        'PASSWORD': 'APRMAPPO',
-        'HOST': 'tcenhvbssprd128.telkom.co.za',
-        'PORT': '1527',
-    },
-    'readoms': {
-        'ENGINE':   'django.db.backends.oracle',
-        'NAME':     'prdoms',
-        'USER':     'READOMS',
-        'PASSWORD': 'READOMS',
-        'HOST': 'tcenhvbssprd127.telkom.co.za',
-        'PORT': '1527',
-    },
-    'refwork': {
-        'ENGINE':   'django.db.backends.oracle',
-        'NAME':     'prdprm',
-        'USER':     'aprmrefwork',
-        'PASSWORD': 'aprmrefwork',
-        'HOST': 'tcenhvbssprd128.telkom.co.za',
-        'PORT': '1527',
-    },
-    'refwait': {
-        'ENGINE':   'django.db.backends.oracle',
-        'NAME':     'prdprm',
-        'USER':     'aprmrefwait',
-        'PASSWORD': 'aprmrefwait',
-        'HOST': 'tcenhvbssprd128.telkom.co.za',
-        'PORT': '1527',
-    },
-    'xprmseco': {
-        'ENGINE':   'django.db.backends.oracle',
-        'NAME':     'prdprm',
-        'USER':     'xaprmseco',
-        'PASSWORD': 'xaprmseco',
-        'HOST': 'tcenhvbssprd128.telkom.co.za',
-        'PORT': '1527',
-    },
 }
-
-
 
 # Password validation
 # https://docs.djangoproject.com/en/1.11/ref/settings/#auth-password-validators
@@ -162,13 +104,15 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
+#TIME_ZONE = 'UTC'
 TIME_ZONE = 'Africa/Harare'
+
 
 USE_I18N = True
 
 USE_L10N = True
 
-USE_TZ = True
+USE_TZ = False
 
 
 # Static files (CSS, JavaScript, Images)
@@ -183,3 +127,4 @@ STATIC_ROOT = os.path.join(os.path.dirname(BASE_DIR), "static_cdn", "static_root
 MEDIA_URL = '/media/'
 
 MEDIA_ROOT = os.path.join(os.path.dirname(BASE_DIR), "static_cdn", "media_root")
+
